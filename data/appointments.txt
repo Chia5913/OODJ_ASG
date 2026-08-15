@@ -1,0 +1,3 @@
+# appointmentId|patientId|doctorId|date|time|status|notes
+APT-1786593296440-AE0|PAT-001|DOC-001|2026-08-05|09:30|COMPLETED|Follow-up checkup
+APT-1786593296449-786|PAT-002|DOC-001|2026-08-05|11:00|PENDING|First visit - chest pain

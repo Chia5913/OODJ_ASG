@@ -1,0 +1,2 @@
+# id|name|email|phone|password|role|managedDepartmentId|active
+MGR-001|Dr. Jennifer Lee|manager@hms.com|010-2222222|manager123|MANAGER|DEPT-CARD|true
