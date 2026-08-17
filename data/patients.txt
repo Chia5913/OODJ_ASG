@@ -1,0 +1,3 @@
+# id|name|email|phone|password|role|bloodType|allergies|insuranceProvider|emergencyContact
+PAT-001|Ahmad Faiz|ahmad@email.com|011-1111111|patient123|PATIENT|O+|None|Allianz|012-9999999
+PAT-002|Siti Nurhaliza|siti@email.com|012-2222222|patient123|PATIENT|A+|Penicillin|Great Eastern|013-8888888

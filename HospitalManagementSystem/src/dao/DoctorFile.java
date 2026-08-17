@@ -28,6 +28,16 @@ public class DoctorFile {
         return null;
     }
 
+    public List<Doctor> findByManagerId(String managerId) {
+        List<Doctor> matchingDoctors = new ArrayList<>();
+        for (Doctor doctor : getAll()) {
+            if (doctor.getManagerId().equalsIgnoreCase(managerId) && doctor.isActive()) {
+                matchingDoctors.add(doctor);
+            }
+        }
+        return matchingDoctors;
+    }
+
     public Doctor findByEmail(String email) {
         for (Doctor d : getAll()) {
             if (d.getEmail().equalsIgnoreCase(email)) return d;

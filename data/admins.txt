@@ -1,0 +1,2 @@
+# id|name|email|phone|password|role|staffPosition|active
+ADM-001|Admin User|admin@hms.com|010-1111111|admin123|ADMIN|Records|true

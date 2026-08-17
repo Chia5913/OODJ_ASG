@@ -1,0 +1,3 @@
+# id|name|email|phone|password|role|specialty|departmentId|managerId|fee|shift|active
+DOC-001|Aisha Rahman|doctor@hms.com|012-3456789|doctor123|DOCTOR|Cardiology|DEPT-CARD|MGR-001|150.0|Morning|true
+DOC-002|Wei Ming Tan|doctor2@hms.com|013-9876543|doctor123|DOCTOR|Neurology|DEPT-NEURO|MGR-001|180.0|Afternoon|true

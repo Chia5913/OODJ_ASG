@@ -1,0 +1,4 @@
+# departmentId|name|description|managerId
+DEPT-CARD|Advanced Cardiology|Advanced heart and cardiovascular treatment|MGR-001
+DEPT-NEURO|Neurology|Brain and nervous system care|MGR-001
+DEPT-ORTH|Orthopaedics|Bone and joint care|MGR-002

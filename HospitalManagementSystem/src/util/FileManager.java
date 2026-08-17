@@ -30,6 +30,7 @@ public class FileManager {
     public static final String ADMINS_FILE         = DATA_DIR + "/admins.txt";
     public static final String MANAGERS_FILE       = DATA_DIR + "/managers.txt";
     public static final String DEPARTMENTS_FILE    = DATA_DIR + "/departments.txt";
+    public static final String SHIFT_ROSTERS_FILE = DATA_DIR + "/shift_rosters.txt";
     public static final String ASSETS_FILE         = DATA_DIR + "/assets.txt";
     public static final String FEEDBACK_FILE       = DATA_DIR + "/feedback.txt";
 
@@ -52,6 +53,8 @@ public class FileManager {
             "# id|name|email|phone|password|role|managedDepartmentId|active";
     public static final String HEADER_DEPARTMENTS =
             "# departmentId|name|description|managerId";
+    public static final String HEADER_SHIFT_ROSTERS =
+        "# rosterId|doctorId|departmentId|shiftDate|startTime|endTime|shiftType";
     public static final String HEADER_ASSETS =
             "# assetId|name|type|location|status";
     public static final String HEADER_FEEDBACK =
