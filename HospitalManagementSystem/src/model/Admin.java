@@ -1,10 +1,5 @@
 package model;
 
-/**
- * Administrative Staff – inherits from Person.
- * Teammate: expand fields / methods as needed for Admin features
- * (CRUD users, assign doctors, manage rooms/wards, configure rates).
- */
 public class AdminStaff extends Person {
     private static final long serialVersionUID = 1L;
 

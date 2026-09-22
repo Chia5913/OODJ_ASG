@@ -1,10 +1,6 @@
 package model;
 
-/**
- * Physical hospital asset: consultation room, ward, lab, X-ray room, etc.
- * Primarily managed by Admin Staff.
- * Teammate can extend (capacity, floor, equipment...).
- */
+
 public class HospitalAsset {
     private String assetId;
     private String name;
