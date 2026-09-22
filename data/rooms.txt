@@ -1,0 +1,1 @@
+room_id,room_designated_name,room_role,room_door_number,room_status
