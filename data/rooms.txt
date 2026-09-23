@@ -1,1 +1,7 @@
-room_id,room_designated_name,room_role,room_door_number,room_status
+room_door_number_id,room_designated_name,room_role,room_status
+101,Consultation Room 1,Consultation Room,true
+102,Consultation Room 2,Consultation Room,true
+103,X-Ray Room 1,X-Ray Room,true
+104,Imagine Room 1,Imaging Room,true
+201,In-Patient Ward 1,In-Patient Ward,true
+202,Lab 1,Lab,true

@@ -1,1 +1,1 @@
-user_id,user_name,user_email,user_hash_password,admin_first_name,admin_last_name,admin_salary
+user_id,user_name,user_email,user_hash_password,admin_first_name,admin_last_name,admin_salary,is_active
