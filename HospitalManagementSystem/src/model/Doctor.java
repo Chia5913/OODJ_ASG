@@ -1,9 +1,5 @@
 package model;
 
-/**
- * Doctor inherits from Person (Inheritance).
- * Demonstrates Encapsulation of doctor-specific attributes.
- */
 public class Doctor extends Person {
     private static final long serialVersionUID = 1L;
 
@@ -21,8 +17,8 @@ public class Doctor extends Person {
     }
 
     public Doctor(String id, String name, String email, String phone, String password,
-                  String specialty, String departmentId, String managerId,
-                  double consultationFee, String shift) {
+                String specialty, String departmentId, String managerId,
+                double consultationFee, String shift) {
         super(id, name, email, phone, password, "DOCTOR");
         this.specialty = specialty;
         this.departmentId = departmentId;
@@ -32,7 +28,7 @@ public class Doctor extends Person {
         this.active = true;
     }
 
-    // ----- Getters & Setters -----
+    // Getters & Setters
     public String getSpecialty() { return specialty; }
     public void setSpecialty(String specialty) { this.specialty = specialty; }
 
@@ -56,19 +52,19 @@ public class Doctor extends Person {
         return "Dr. " + name + " (" + specialty + ") - Fee: RM" + String.format("%.2f", consultationFee);
     }
 
-    /**
-     * Convert object to a single line for text-file storage.
-     * Format: id|name|email|phone|password|role|specialty|departmentId|managerId|fee|shift|active
-     */
+
+    //Convert object to a single line for text-file storage.
+    //Format: id|name|email|phone|password|role|specialty|departmentId|managerId|fee|shift|active
+
     public String toFileString() {
         return id + "|" + name + "|" + email + "|" + phone + "|" + password + "|" + role + "|"
                 + specialty + "|" + departmentId + "|" + managerId + "|"
                 + consultationFee + "|" + shift + "|" + active;
     }
 
-    /**
-     * Reconstruct a Doctor from a line read from the text file.
-     */
+    
+    //Reconstruct a Doctor from a line read from the text file.
+
     public static Doctor fromFileString(String line) {
         if (line == null || line.trim().isEmpty()) return null;
         String[] p = line.split("\\|", -1);

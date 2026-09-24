@@ -68,10 +68,10 @@ public class FileManager {
         }
     }
 
-    /**
-     * Read every non-empty, non-comment line from a file.
-     * Comment lines start with '#'.
-     */
+
+    //Read every non-empty, non-comment line from a file.
+    //Comment lines start with '#'.
+
     public static List<String> readAllLines(String filePath) {
         List<String> lines = new ArrayList<>();
         Path path = Paths.get(filePath);
@@ -92,10 +92,10 @@ public class FileManager {
         return lines;
     }
 
-    /**
-     * Overwrite the entire file with a header comment + data lines.
-     * Safe for manual editing: open the .txt, change a field, save, restart app.
-     */
+
+    //Overwrite the entire file with a header comment + data lines.
+    //Safe for manual editing: open the .txt, change a field, save, restart app.
+
     public static void writeAllLines(String filePath, String headerComment, List<String> dataLines) {
         try {
             Files.createDirectories(Paths.get(filePath).getParent());
@@ -116,16 +116,15 @@ public class FileManager {
         }
     }
 
-    /**
-     * Overwrite without a custom header (keeps previous behaviour for simple cases).
-     */
+    //Overwrite without a custom header (keeps previous behaviour for simple cases).
+
     public static void writeAllLines(String filePath, List<String> lines) {
         writeAllLines(filePath, null, lines);
     }
 
-    /**
-     * Append a single data line (does not rewrite header).
-     */
+
+    //Append a single data line (does not rewrite header).
+
     public static void appendLine(String filePath, String line) {
         try {
             Files.createDirectories(Paths.get(filePath).getParent());
@@ -141,9 +140,9 @@ public class FileManager {
         }
     }
 
-    /**
-     * Generate a unique ID, e.g. DOC-1722678901234-A3F
-     */
+
+    //Generate a unique ID, e.g. DOC-1722678901234-A3F
+
     public static String generateId(String prefix) {
         long ts = System.currentTimeMillis();
         String rnd = Integer.toHexString((int) (Math.random() * 0xFFF)).toUpperCase();

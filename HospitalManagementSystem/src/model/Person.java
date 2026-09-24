@@ -2,10 +2,10 @@ package model;
 
 import java.io.Serializable;
 
-/**
- * Abstract base class demonstrating Abstraction + Encapsulation.
- * All users (Doctor, Patient, Admin, Medical Manager) inherit from Person.
- */
+
+//Abstract base class demonstrating Abstraction + Encapsulation.
+//All users (Doctor, Patient, Admin, Medical Manager) inherit from Person.
+
 public abstract class Person implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -27,7 +27,7 @@ public abstract class Person implements Serializable {
         this.role = role;
     }
 
-    // ----- Getters & Setters (Encapsulation) -----
+    //Getters & Setters (Encapsulation)
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
@@ -46,9 +46,9 @@ public abstract class Person implements Serializable {
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
 
-    /**
-     * Abstract method - forces subclasses to provide their own display logic (Polymorphism).
-     */
+
+    //Abstract method - forces subclasses to provide their own display logic (Polymorphism).
+
     public abstract String getDisplayInfo();
 
     @Override
