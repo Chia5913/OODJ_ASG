@@ -11,12 +11,14 @@ public class LoadRoom {
 
     private List<HospitalRoom> roomsList = new ArrayList<>();
     private String filePath = "data/rooms.txt";
+    private String[] roomHeader;
 
     public String loadRoom() {
         roomsList.clear();
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             line = br.readLine();
+            this.roomHeader = line.split(",");
             while((line = br.readLine()) != null) {
                 String[] data = line.split(",");
                 int roomDoorNumberId = Integer.parseInt(data[0].trim());
@@ -34,5 +36,26 @@ public class LoadRoom {
 
     public List<HospitalRoom> getRoomsList() {
         return this.roomsList; 
+    }
+
+    public String[] getRoomHeader() {
+        return this.roomHeader;
+    }
+
+    public int getLatestRoomId(int selectedFloorNumber) {
+        int latestRoomId = 0;
+        int floorNumber;
+        for (HospitalRoom a : roomsList) {
+            roomId = a.getDoorNumberId();
+            while(roomId > 10) {
+                floorNumber = roomId / 100;
+            }
+            if (selectedFloorNumber == floorNumber) {
+                if (roomId > latestRoomId) {
+                    latestRoomId = roomId;
+                }
+            }
+        }
+        return latestRoomId + 1;
     }
 }

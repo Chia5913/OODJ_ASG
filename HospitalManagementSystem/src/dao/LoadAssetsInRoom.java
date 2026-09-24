@@ -18,6 +18,7 @@ public class LoadAssetsInRoom {
     private String fileName;
     private int roomId;
     private String roomDesignatedRole;
+    private String[] roomAssetsHeader;
 
     public String loadAsset() {
         assetInRoomList.clear();
@@ -31,6 +32,7 @@ public class LoadAssetsInRoom {
             String line;
             try (BufferedReader br = new BufferedReader(new FileReader(this.filePath))) {
                 line = br.readLine();
+                this.roomAssetsHeader = line.split(",");
                 while ((line = br.readLine() != null)) {
                     String[] data = line.split(",");
                     int assetId = Integer.parseInt(data[0].trim());
@@ -58,5 +60,18 @@ public class LoadAssetsInRoom {
 
     public List<HospitalAsset> getAssetInRoomList() {
         return this.assetInRoomList;
+    }
+
+    public int getLatestAssetIdInRoom(int roomSelectedId) {
+        int latestAssetId = 0;
+        for (HospitalAsset a: assetInRoomList) {
+            int roomId = a.getAssetAtRoomId();
+            if (roomId == roomSelectedId) {
+                if (roomId > latestAssetId) {
+                    latestAssetId = roomId;
+                }
+            }
+        }
+        return latestAssetId + 1;
     }
 }

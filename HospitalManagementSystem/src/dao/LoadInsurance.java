@@ -11,12 +11,14 @@ public class LoadInsurance {
 
     private String filePath = "data/insurance_list.txt";
     private List<Insurance> insuranceList = new ArrayList<>();
+    private String[] insuranceHeader;
 
     public String loadInsurance() {
         insuranceList.clear();  
         try (BufferedReader br = new BufferedReader(new FileReader(this.filePath))) {
             String line;
             line = br.readLine();
+            this.insuranceHeader = line.split(",");
             while((line=br.readLine()) != null) {
                 String[] data = line.split(",");
                 int insuraneId = Integer.parseInt(data[0].trim());
@@ -34,4 +36,19 @@ public class LoadInsurance {
     public List<Insurance> getInsuranceList() {
         return this.insuranceList;
     }
+
+    public String[] getInsuranceHeader() {
+        return this.insuranceHeader;
+    }
+
+    public int getLatestInsuranceId() {
+        int latestInsuranceId = 0;
+        for (Insurance i : this.insuranceList) {
+            if (i.getInsuranceId() > latestInsuranceId) {
+                latestInsuranceId = i.getInsuranceId();
+            }
+        }
+        return latestInsuranceId + 1;
+    }
+    
 }

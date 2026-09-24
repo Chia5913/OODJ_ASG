@@ -11,12 +11,14 @@ public class LoadAdmin {
 
     private String filePath = "data/admins.txt";
     private List<Admin> adminList = new ArrayList<>();
+    private String[] adminFileHeader;
 
     public String loadAdmin() {
         adminList.clear();
         try (BufferedReader br = new BufferedReader(new FileReader(this.filePath))) {
             String line;
             line = br.readLine();
+            this.adminFileHeader = line.split(",");
             while((line = br.readLine()) != null) {
                 String[] data = line.split(",");
                 int userId = Integer.parseInt(data[0].trim());
@@ -38,8 +40,21 @@ public class LoadAdmin {
 
     }
 
-    public List<Admin> returnAdmin() {
+    public List<Admin> getAdminList() {
         return this.adminList;
     }
 
+    public String[] getAdminHeader() {
+        return this.adminFileHeader;
+    }
+
+    public int getLatestAdminId() {
+        int latestAdminId = 0;
+        for (Admin i: this.adminList) {
+            if (i.getUserId() > latestAdminId) {
+                latestAdminId = i.getUserId();
+            }
+        }
+        return latestAdminId + 1;
+    }
 }
