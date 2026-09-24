@@ -19,7 +19,7 @@ public class HospitalRoom {
     }
 
     public String getRoomRole() {
-        return this.roomDeisgnatedRole;
+        return this.roomDesignatedRole;
     }
 
     public int getDoorNumberId() {

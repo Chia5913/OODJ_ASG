@@ -10,8 +10,8 @@ public class LoadConsultRate {
     private double consultationRate;
 
     public String loadConsultationRate() {
-        String line;
         try (BufferedReader br = new BufferedReader(new FileReader(this.filePath))) {
+            String line; 
             this.consultationRate = Double.parseDouble(br.readLine().trim());
         } catch (IOException e) {
             return "Consultation file not found";

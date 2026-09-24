@@ -25,7 +25,7 @@ public class HospitalAsset {
 
     }
 
-    /*Overloading to give asset acquisition date a default placeholder if none is inputted*/
+    /*Overloading to give asset acquisition date a default placeholder if none is provided*/
     public HospitalAsset(int assetId, String assetName, int assetAtRoomId, int assetMaintenanceId) {
         this.assetId = assetId;
         this.assetName = assetName;

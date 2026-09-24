@@ -13,8 +13,10 @@ public class LoadInsurance {
     private List<Insurance> insuranceList = new ArrayList<>();
 
     public String loadInsurance() {
-        String line;
+        insuranceList.clear();  
         try (BufferedReader br = new BufferedReader(new FileReader(this.filePath))) {
+            String line;
+            line = br.readLine();
             while((line=br.readLine()) != null) {
                 String[] data = line.split(",");
                 int insuraneId = Integer.parseInt(data[0].trim());

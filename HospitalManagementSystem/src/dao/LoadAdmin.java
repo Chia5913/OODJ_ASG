@@ -16,6 +16,7 @@ public class LoadAdmin {
         adminList.clear();
         try (BufferedReader br = new BufferedReader(new FileReader(this.filePath))) {
             String line;
+            line = br.readLine();
             while((line = br.readLine()) != null) {
                 String[] data = line.split(",");
                 int userId = Integer.parseInt(data[0].trim());
