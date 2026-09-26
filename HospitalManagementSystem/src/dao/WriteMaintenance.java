@@ -6,13 +6,14 @@ import java.io.FileWriter;
 import java.io.BufferedWriter;
 import model.HospitalAssetMaintenance;
 
-public class WriteMaintenance {
+public class WriteMaintenance implements InterfaceWriteAdmin<HospitalAssetMaintenance>{
 
     private String filePath = "data/asset_maintenances.txt";
     private String maintenanceHeader = "asset_maintenance_id,asset_maintenance_name";
-    private HospitalAssetMaintenance maintenanceObjectList;
+    private List<HospitalAssetMaintenance> maintenanceObjectList;
 
-    public String writeMaintenance(String maintenanceString) {
+    @Override
+    public String writeFile(String maintenanceString) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, true))) {
             bw.write(maintenanceString);
             bw.newLine();
@@ -23,18 +24,29 @@ public class WriteMaintenance {
         return "Asset maintenance updated";
     }
 
-    public String writeMaintenance(List<HospitalAssetMaintenance> maintenanceObjectList) {
+    @Override
+    public String writeFile(List<HospitalAssetMaintenance> maintenanceObjectList) {
         this.maintenanceObjectList = maintenanceObjectList;
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, false))) {
             bw.write(maintenanceHeader);
             bw.newLine();
             for (HospitalAssetMaintenance a : this.maintenanceObjectList) {
-                bw.write(a.getAssetMaintenanceId() + "," + a.getAssetMaintenanceName())
+                bw.write(a.getAssetMaintenanceId() + "," + a.getAssetMaintenanceName());
                 bw.newLine();
             }
         } catch (IOException e) {
             return "Asset maintenance file not found";
         }
         return "Asset Maintenance file not found";
+    }
+
+    @Override
+    public String writeFile(String x, String filePath) {
+        return "This action is not supported";
+    }
+
+    @Override
+    public String writeFile(List<HospitalAssetMaintenance> x, String filePath) {
+        return "This action is not supported";
     }
 }

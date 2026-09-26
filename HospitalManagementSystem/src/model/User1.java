@@ -4,7 +4,7 @@ There is no setter method is because of only allowing manipulation of data via t
 package model;
 
 
-public class User1 {
+public abstract class User1 {
 
     protected int userId;
     protected String userName;

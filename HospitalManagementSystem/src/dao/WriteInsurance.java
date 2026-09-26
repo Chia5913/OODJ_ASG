@@ -1,18 +1,20 @@
 package dao;
 
+import model.Insurance;
 import java.util.List;
 import java.io.IOException;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 
-public class WriteInsurance {
+public class WriteInsurance implements InterfaceWriteAdmin<Insurance> {
 
     private String filePath = "data/insurance_list.txt" ;
     private List<Insurance> insuranceObjectList;
     private String insuranceString;
     private String insuranceHeader = "insurance_id,insurance_name,insurance_is_active";
 
-    public String writeInsurance(String insuranceString) {
+    @Override
+    public String writeFile(String insuranceString) {
         this.insuranceString = insuranceString;
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, true))) {
             bw.write(this.insuranceString);
@@ -23,7 +25,8 @@ public class WriteInsurance {
         return "Insurance list updated";
     }
 
-    public String writeInsurance(List<Insurance> insuranceObjectList) {
+    @Override
+    public String writeFile(List<Insurance> insuranceObjectList) {
         this.insuranceObjectList = insuranceObjectList;
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, false))) {
             bw.write(insuranceHeader);
@@ -37,5 +40,15 @@ public class WriteInsurance {
             return "Insurance file not found";
         }
         return "Insurance list updated";
+    }
+
+    @Override
+    public String writeFile(String x, String filePath) {
+        return "This action is not supported";
+    }
+
+    @Override
+    public String writeFile(List<Insurance> x, String filePath) {
+        return "This action is not supported";
     }
 }

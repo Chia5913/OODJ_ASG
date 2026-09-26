@@ -2,16 +2,18 @@ package dao;
 
 import model.HospitalRoom;
 import java.util.List;
-import java.io.FileWriiter;
+import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-public class WriteRoom {
+public class WriteRoom implements InterfaceWriteAdmin<HospitalRoom> {
 
     private String filePath = "data/rooms.txt";
     private List<HospitalRoom> roomObjectList;
+    private String roomHeader = "room_door_number_id,room_designated_name,room_role,room_status";
 
-    public String writeRoom(String roomString){
+    @Override 
+    public String writeFile(String roomString){
         try (BufferedWriter bw = new BufferedWriter (new FileWriter(filePath, true))) {
             bw.write(roomString);
             bw.newLine();
@@ -21,10 +23,8 @@ public class WriteRoom {
         return "Rooms file updated successfully";
     }
 
-    public String writeRoom(List<HospitalRoom> roomObjectList) {
-        LoadRoom roomLoader = new LoadRoom();
-        String loadRoomStatus = roomLoader.loadRoom();
-        String roomHeader = roomLoader.getRoomHeader();
+    @Override
+    public String writeFile(List<HospitalRoom> roomObjectList) {
         this.roomObjectList = roomObjectList;
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, false))) {
             bw.write(roomHeader);
@@ -37,5 +37,15 @@ public class WriteRoom {
             return "Room file not found";
         }
         return "Room file updated successfully.";
+    }
+
+    @Override
+    public String writeFile(String x, String filePath) {
+        return "This action is not supported";
+    }
+
+    @Override
+    public String writeFile(List<HospitalRoom> x, String filePath) {
+        return "This action is not supported";
     }
 }

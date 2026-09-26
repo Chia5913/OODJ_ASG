@@ -7,17 +7,17 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-public class LoadRoom {
+public class LoadRoom implements InterfaceLoadAdmin<HospitalRoom> {
 
     private List<HospitalRoom> roomsList = new ArrayList<>();
     private String filePath = "data/rooms.txt";
-    private String roomHeader;
 
-    public String loadRoom() {
+    @Override
+    public String readLoadFile() {
         roomsList.clear();
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
-            this.roomHeader = br.readLine();
+            br.readLine();
             while((line = br.readLine()) != null) {
                 String[] data = line.split(",");
                 int roomDoorNumberId = Integer.parseInt(data[0].trim());
@@ -33,13 +33,12 @@ public class LoadRoom {
         return "Rooms loaded";
     }
 
-    public List<HospitalRoom> getRoomsList() {
+    @Override
+    public List<HospitalRoom> getObjectList() {
+        String status = readLoadFile();
         return this.roomsList; 
     }
 
-    public String getRoomHeader() {
-        return this.roomHeader;
-    }
 
     public int getLatestRoomId(int selectedFloorNumber) {
         int latestRoomId = 0;

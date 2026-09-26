@@ -5,14 +5,16 @@ import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.ArrayList;
 
-public class WriteAdmin {
+public class WriteAdmin implements InterfaceWriteAdmin<Admin> {
 
     private String filePath = "data/admins.txt";
     private List<Admin> adminList = new ArrayList<>();
     private String adminFileHeader = "user_id,user_name,user_email,user_hash_password,admin_first_name,admin_last_name,admin_salary,is_active";
 
-    public String writeAdmin(String adminString) {
+    @Override /*plus overloading*/
+    public String writeFile(String adminString) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, true))) {
             bw.write(adminString);
             bw.newLine();
@@ -20,10 +22,11 @@ public class WriteAdmin {
             return "Admin file not found";
         }
 
-        return "Append admin file successful"
+        return "Append admin file successful";
     }
 
-    public String writeAdmin(List<Admin> adminObject) {
+    @Override
+    public String writeFile(List<Admin> adminObject) {
         this.adminList = adminObject;
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, false))) {
             bw.write(adminFileHeader);
@@ -37,6 +40,16 @@ public class WriteAdmin {
             return "Admin file not found";
         }
         return "Update admin file successful";
+    }
+
+    @Override 
+    public String writeFile(String adminString, String filePath) {
+        return "This action is not supported";
+    }
+
+    @Override
+    public String writeFile(List<Admin> adminObject, String filePath) {
+        return "This action is not supported";
     }
 
 }

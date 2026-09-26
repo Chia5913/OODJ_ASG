@@ -7,18 +7,17 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-public class LoadAdmin {
+public class LoadAdmin implements InterfaceLoadAdmin<Admin>{
 
     private String filePath = "data/admins.txt";
     private List<Admin> adminList = new ArrayList<>();
-    private String[] adminFileHeader;
 
-    public String loadAdmin() {
+    @Override
+    public String readLoadFile() {
         adminList.clear();
         try (BufferedReader br = new BufferedReader(new FileReader(this.filePath))) {
             String line;
             line = br.readLine();
-            this.adminFileHeader = line.split(",");
             while((line = br.readLine()) != null) {
                 String[] data = line.split(",");
                 int userId = Integer.parseInt(data[0].trim());
@@ -36,25 +35,15 @@ public class LoadAdmin {
         catch (IOException e) {
             return "File for admin is not found";
         }
-        return "Admins successfully loaded"
+        return "Admins successfully loaded";
 
     }
 
-    public List<Admin> getAdminList() {
+    @Override
+    public List<Admin> getObjectList() {
+        String status = readLoadFile();
         return this.adminList;
     }
 
-    public String[] getAdminHeader() {
-        return this.adminFileHeader;
-    }
 
-    public int getLatestAdminId() {
-        int latestAdminId = 0;
-        for (Admin i: this.adminList) {
-            if (i.getUserId() > latestAdminId) {
-                latestAdminId = i.getUserId();
-            }
-        }
-        return latestAdminId + 1;
-    }
 }

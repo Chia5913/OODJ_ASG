@@ -7,15 +7,16 @@ import java.io.IOException;
 import java.io.FileReader;
 import java.io.BufferedReader;
 
-public class LoadMaintenance {
+public class LoadMaintenance implements InterfaceLoaderAdmin<HospitalAssetMaintenance>{
 
     private String filePath = "data/asset_maintenances.txt";
     private List<HospitalAssetMaintenance> maintenanceList = new ArrayList<>();
-    private String line;
-
-    public String loadMaintenace() {
+    
+    @Override
+    public String readLoadFile() {
         maintenanceList.clear();
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(this.filePath))) {
+            String line;
             br.readLine();
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",");
@@ -30,7 +31,9 @@ public class LoadMaintenance {
         return "Asset maintenance file loaded";
     }
 
-    public List<HospitalAssetMaintenance> getMaintenanceObjectList() {
+    @Override
+    public List<HospitalAssetMaintenance> getObjectList() {
+        String status = readLoadFile();
         return this.maintenanceList;
     }
 

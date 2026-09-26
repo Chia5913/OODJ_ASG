@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.FileReader;
 import java.io.BufferedReader;
 
-public class LoadAssetsInRoom {
+public class LoadAssetsInRoom implements InterfaceLoadAdmin<HospitalAsset>{
 
     private List<HospitalRoom> hospitalRoomsList = new ArrayList<>(); 
     private List<HospitalAsset> assetInRoomList = new ArrayList<>();
@@ -18,9 +18,9 @@ public class LoadAssetsInRoom {
     private String fileName;
     private int roomId;
     private String roomDesignatedRole;
-    private String[] roomAssetsHeader;
 
-    public String loadAsset() {
+    @Override
+    public String readLoadFile() {
         assetInRoomList.clear();
         roomLoader.loadRoom();
         this.hospitalRoomsList = roomLoader.getRoomsList();
@@ -32,8 +32,7 @@ public class LoadAssetsInRoom {
             String line;
             try (BufferedReader br = new BufferedReader(new FileReader(this.filePath))) {
                 line = br.readLine();
-                this.roomAssetsHeader = line.split(",");
-                while ((line = br.readLine() != null)) {
+                while ((line = br.readLine()) != null) {
                     String[] data = line.split(",");
                     int assetId = Integer.parseInt(data[0].trim());
                     String assetName = data[1].trim();
@@ -47,7 +46,7 @@ public class LoadAssetsInRoom {
                         assetInRoomList.add(hospitalAssetObject);
                     } else {
                         HospitalAsset hospitalAssetObject = new HospitalAsset(assetId, assetName, assetAcquisitionYear, assetAcquisitionMonth, assetAcquisitionDay, assetAtRoomId, assetMaintenanceId);
-                        assetInRoomList.add(hospitalAsetObject);
+                        assetInRoomList.add(hospitalAssetObject);
                     }
                 }
             } catch (IOException e) {
@@ -58,7 +57,9 @@ public class LoadAssetsInRoom {
 
     }
 
-    public List<HospitalAsset> getAssetInRoomList() {
+    @Override
+    public List<HospitalAsset> getObjectList() {
+        String status = readLoadFile();
         return this.assetInRoomList;
     }
 

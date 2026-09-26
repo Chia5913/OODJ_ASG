@@ -20,6 +20,7 @@ public class LoadConsultRate {
     }
 
     public double getConsultationRate() {
+        String status = loadConsultationRate();
         return this.consultationRate;
     }
 }
