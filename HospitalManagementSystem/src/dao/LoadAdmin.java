@@ -1,11 +1,11 @@
 package dao;
 
-import model.Admin;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.FileReader;
-import java.io.BufferedReader;
-import java.io.IOException;
+import model.Admin;
 
 public class LoadAdmin implements InterfaceLoadAdmin<Admin>{
 
@@ -28,7 +28,7 @@ public class LoadAdmin implements InterfaceLoadAdmin<Admin>{
                 String adminLastName = data[5].trim();
                 double adminSalary = Double.parseDouble(data[6].trim());
                 boolean isActive = Boolean.parseBoolean(data[7].trim());
-                Admin loadedAdminObject = new Admin(userId, userName, userEmail, userHashPassword, adminFirstName, adminLastName, adminSalary, isActive);
+                Admin loadedAdminObject = new Admin(userId, userName, userEmail, userHashPassword, isActive, adminFirstName, adminLastName, adminSalary);
                 adminList.add(loadedAdminObject);
             }
         }

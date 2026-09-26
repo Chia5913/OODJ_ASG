@@ -1,4 +1,6 @@
 package dao;
+import java.util.List;
+
 
 public interface InterfaceLoadAdmin<X> {
 

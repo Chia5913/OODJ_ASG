@@ -1,17 +1,16 @@
 package ui;
 
-import dao.AdminFile;
+//import dao.AdminFile;
 import dao.DoctorFile;
 import dao.ManagerFile;
 import dao.PatientFile;
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import model.Patient;
 import util.FileManager;
 import util.Theme;
 import util.Validation;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
 
 public class PatientRegistrationFrame
         extends JFrame {
@@ -603,14 +602,14 @@ public class PatientRegistrationFrame
 
             return true;
         }
-
+/*
         if (new AdminFile()
                 .findByEmail(email)
                 != null) {
 
             return true;
         }
-
+*/
         return new ManagerFile()
                 .findByEmail(email)
                 != null;

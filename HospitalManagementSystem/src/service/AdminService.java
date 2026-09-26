@@ -1,17 +1,18 @@
 package service;
-
-import java.util.List;
-import java.util.ArrayList;
-import dao.LoadAdmin;
-import dao.WriteAdmin;
 import dao.DoctorFile;
+import dao.LoadAdmin;
 import dao.ManagerFile;
 import dao.PatientFile;
+import dao.WriteAdmin;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import model.Admin;
 import model.Doctor;
-import model.Patient;
 import model.MedicalManager;
+import model.Patient;
+
 
 public class AdminService {
 
@@ -23,6 +24,7 @@ public class AdminService {
     public AdminService() {
         LoadAdmin lA = new LoadAdmin();
         this.adminList = lA.getObjectList();
+
     }
 
     public int getLatestAdminId() {
@@ -42,14 +44,19 @@ public class AdminService {
     }
 
     public String passwordHasher(String plaintextPassword) {
-        if ((plaintextPassword.trim().length()) > 16 ) {
-            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-            byte[] hashedBytes = messageDigest.digest(plaintextPassword.trim().getBytes());
-            StringBuilder stringBuilder = new StringBuilder();
-            for (byte a : hashedBytes) {
-                stringBuilder.append(String.format("%02x", a));
+        if (plaintextPassword.trim().length() > 16) {
+            try {
+                MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+                byte[] hashedBytes = messageDigest.digest(plaintextPassword.trim().getBytes());
+                StringBuilder stringBuilder = new StringBuilder();
+                for (byte a : hashedBytes) {
+                    stringBuilder.append(String.format("%02x", a));
+                }
+                return stringBuilder.toString();
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+                return plaintextPassword; // 兜底返回原密码
             }
-            return stringBuilder.toString();            
         } else {
             return plaintextPassword;
         }
@@ -152,7 +159,7 @@ public class AdminService {
     public String addPatient(String id, String name, String email, String phone, String password, String bloodType, String allergies, String insuranceProvider, String emergencyContact) {
         PatientFile pF = new PatientFile();
         Patient patient = new Patient(id, name, email, phone, password, bloodType, allergies, insuranceProvider, emergencyContact);
-        pF.add(patient);
+        pF.save(patient);
         return "Patient file had been updated";
     }
 

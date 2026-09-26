@@ -14,7 +14,7 @@ public class HospitalAssetMaintenance {
         return this.assetMaintenanceId;
     }
 
-    public Strng getAssetMaintenanceName() {
+    public String getAssetMaintenanceName() {
         return this.assetMaintenanceName;
     }
 }

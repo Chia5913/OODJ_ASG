@@ -1,20 +1,18 @@
 package ui;
 
-import dao.AdminFile;
+//import dao.AdminFile;
 import dao.AppointmentFile;
 import dao.DoctorFile;
 import dao.ManagerFile;
 import dao.PatientFile;
-import model.AdminStaff;
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import model.Doctor;
 import model.MedicalManager;
 import model.Patient;
 import util.Theme;
 import util.Validation;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
 
 public class LoginFrame extends JFrame {
 
@@ -31,7 +29,7 @@ public class LoginFrame extends JFrame {
 
         doctorFile.seedDefaultIfEmpty();
         new AppointmentFile().seedDefaultIfEmpty();
-        new AdminFile().seedDefaultIfEmpty();
+        //new AdminFile().seedDefaultIfEmpty();
         new ManagerFile().seedDefaultIfEmpty();
         new PatientFile().seedDefaultIfEmpty();
 
@@ -473,7 +471,7 @@ public class LoginFrame extends JFrame {
 
             return;
         }
-
+/*
         AdminStaff admin =
                 new AdminFile()
                         .authenticate(
@@ -492,7 +490,7 @@ public class LoginFrame extends JFrame {
 
             return;
         }
-
+*/
         MedicalManager manager =
                 new ManagerFile()
                         .authenticate(
