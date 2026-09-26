@@ -48,7 +48,7 @@ public class FileManager {
     public static final String HEADER_LAB_REQUESTS =
             "# requestId|consultationId|patientId|doctorId|testType|urgency|clinicalInfo|status|dateRequested";
     public static final String HEADER_ADMINS =
-            "# id|name|email|phone|password|role|staffPosition|active";
+            "user_id,user_name,user_email,user_hash_password,admin_first_name,admin_last_name,admin_salary,is_active";
     public static final String HEADER_MANAGERS =
             "# id|name|email|phone|password|role|managedDepartmentId|active";
     public static final String HEADER_DEPARTMENTS =
