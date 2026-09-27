@@ -484,7 +484,6 @@ public class LoginFrame extends JFrame {
                 return;
         } else {
                 Validation.showError(this, loginStatus);
-                return;
         }
 
         MedicalManager manager =
