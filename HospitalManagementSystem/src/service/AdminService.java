@@ -20,6 +20,7 @@ public class AdminService {
     private List<Doctor> doctorList;
     private List<Patient> patientList;
     private List<MedicalManager> medicalManagerList;
+    private String loginStatus;
 
     public AdminService() {
         LoadAdmin lA = new LoadAdmin();
@@ -43,7 +44,29 @@ public class AdminService {
         return this.adminList;
     }
 
-    public String passwordHasher(String plaintextPassword) {
+    public Admin getLoggedInAdmin(String email, String plaintextPassword) {
+        this.adminList = lA.getObjectList();
+        for (Admin a: this.adminList) {
+            if (a.getUserEmail().equals(email)) {
+                String encodedPassword = passwordHasher(plaintextPassword);
+                if (a.getUserHashPassword().equals(encodedPassword)) {
+                    this.loginStatus = "true";
+                    return a;
+                } else {
+                    this.loginStatus = "Incorrect password";
+                    return null;
+                }
+            }
+        }
+        this.loginStatus = "User email not found";
+        return null;
+    }
+
+    public String checkUserPassword() {
+        return this.loginStatus;
+    }
+
+    private String passwordHasher(String plaintextPassword) {
         if (plaintextPassword.trim().length() > 16) {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
             byte[] hashedBytes = messageDigest.digest(plaintextPassword.trim().getBytes());
@@ -55,8 +78,8 @@ public class AdminService {
             }
         } else {
             return plaintextPassword;
-        }
     }
+
 
     public String appendAdmin(int userId, String userName, String userEmail, String userPassword, boolean isActive, String adminFirstName, String adminLastName, double adminSalary) {
         WriteAdmin aW = new WriteAdmin();
@@ -164,8 +187,5 @@ public class AdminService {
         pF.delete(id);
         return "Patient file had been updated";
     }
-
-
-
 
 }

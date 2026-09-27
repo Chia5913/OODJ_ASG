@@ -1,6 +1,7 @@
 package ui;
 
-//import dao.AdminFile;
+import service.AdminService;
+import model.Admin;
 import dao.AppointmentFile;
 import dao.DoctorFile;
 import dao.ManagerFile;
@@ -471,26 +472,21 @@ public class LoginFrame extends JFrame {
 
             return;
         }
-/*
-        AdminStaff admin =
-                new AdminFile()
-                        .authenticate(
-                                email,
-                                password
-                        );
-
-        if (admin != null) {
-
-            openDashboard(
-                    () ->
-                            new AdminDashboard(
-                                    admin
-                            ).setVisible(true)
-            );
-
-            return;
+        
+        AdminService aS = new AdminService();
+        Admin admin = aS.getLoggedInAdmin(email, password);        
+        String loginStatus = aS.checkUserPassword();
+        if (loginStatus.equals("true")) {
+                openDashboard(() -> new AdminDashboard(admin).setVisible(true));
+                return;
+        } else if (loginStatus.equals("Incorrect password")){
+                Validation.showError(loginStatus);
+                return;
+        } else {
+                Validation.showError(loginStatus);
+                return;
         }
-*/
+
         MedicalManager manager =
                 new ManagerFile()
                         .authenticate(

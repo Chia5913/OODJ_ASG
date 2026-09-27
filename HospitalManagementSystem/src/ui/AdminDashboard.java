@@ -1,6 +1,6 @@
 package ui;
 
-import model.AdminStaff;
+import model.Admin;
 import util.Theme;
 import util.Validation;
 
@@ -8,25 +8,17 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
-/**
- * Admin Portal Dashboard – scaffold.
- * UI style matches DoctorDashboard (sidebar + CardLayout + Theme).
- *
- * TEAMMATE TODO:
- * 1. Replace buildPlaceholderPanel panels with real feature panels (tables, forms).
- * 2. Add dialogs under ui/ for create/edit actions (same pattern as ProfileDialog).
- * 3. Wire DAO calls (dao/*File) for load/save.
- * 4. Keep Theme / Validation – do not invent a new colour system.
- */
+/*I just modify what my teammate gave me*/
+
 public class AdminDashboard extends JFrame {
 
-    private final AdminStaff currentUser;
+    private Admin currentUser;
     private JPanel contentPanel;
     private CardLayout cardLayout;
     private String activeCard = "HOME";
     private final java.util.List<JButton> navButtons = new java.util.ArrayList<>();
 
-    public AdminDashboard(AdminStaff user) {
+    public AdminDashboard(Admin user) {
         this.currentUser = user;
 
         setTitle("Admin Portal – " + user.getName());
