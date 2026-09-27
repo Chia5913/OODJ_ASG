@@ -68,7 +68,7 @@ public class AdminService {
 
     private String passwordHasher(String plaintextPassword) {
         try {
-            if (plaintextPassword.trim().length() > 16) {
+            if (plaintextPassword.trim().length() < 17) {
                 MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
                 byte[] hashedBytes = messageDigest.digest(plaintextPassword.trim().getBytes());
                 StringBuilder stringBuilder = new StringBuilder();
