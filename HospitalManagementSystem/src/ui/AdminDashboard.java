@@ -5,9 +5,11 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import model.Admin;
 import model.Doctor;
+import model.Insurance;
 import model.MedicalManager;
 import model.Patient;
 import service.AdminService;
+import service.InsuranceService;
 import util.Theme;
 
 
@@ -15,6 +17,11 @@ public class AdminDashboard extends JFrame {
 
     private Admin currentUser;
     private AdminService aS = new AdminService();
+    private String selectedUserId;
+    private JButton addUser = new JButton();
+    private JButton editUser = new JButton();
+    private JButton deleteUser = new JButton(); 
+    private DefaultTableModel model;
 
     public AdminDashboard(Admin user) {
         this.currentUser = user;
@@ -108,33 +115,31 @@ public class AdminDashboard extends JFrame {
         rolesDropDown.setBounds(110,52, 140,25 );
         contentPanel.add(rolesDropDown);
 
-
-        JButton addUser = new JButton();
         addUser.setText("Add User");
         addUser.setCursor(new Cursor(Cursor.HAND_CURSOR));
         addUser.setBounds(580,52, 100, 25);
         contentPanel.add(addUser);
-
-        JButton editUser = new JButton();
+       
         editUser.setText("Edit User");
         editUser.setCursor(new Cursor(Cursor.HAND_CURSOR));
         editUser.setBounds(680,52, 100, 25);
         editUser.setEnabled(false);
         contentPanel.add(editUser);
 
-        JButton deleteUser = new JButton();
         deleteUser.setText("Delete User");
         deleteUser.setCursor(new Cursor(Cursor.HAND_CURSOR));
         deleteUser.setBounds(780,52, 100, 25);
         deleteUser.setEnabled(false);
         contentPanel.add(deleteUser);
 
+        for (java.awt.event.ActionListener al : addUser.getActionListeners()) addUser.removeActionListener(al);
+        for (java.awt.event.ActionListener al : editUser.getActionListeners()) editUser.removeActionListener(al);
+        for (java.awt.event.ActionListener al : deleteUser.getActionListeners()) deleteUser.removeActionListener(al);
+
         String userRole = (String) rolesDropDown.getSelectedItem();
         loadTable(contentPanel, userRole);
 
-        addUser.addActionListener(e -> {});
-        editUser.addActionListener(e -> {});
-        deleteUser.addActionListener(e -> {});
+
         rolesDropDown.addActionListener(e -> loadTable(contentPanel, (String) rolesDropDown.getSelectedItem()));
 
         contentPanel.revalidate();
@@ -167,6 +172,13 @@ public class AdminDashboard extends JFrame {
     }
 
     private void loadTable(JPanel contentPanel, String userRole) {
+        editUser.setEnabled(false);
+        deleteUser.setEnabled(false);
+
+        for (java.awt.event.ActionListener al : addUser.getActionListeners()) addUser.removeActionListener(al);
+        for (java.awt.event.ActionListener al : editUser.getActionListeners()) editUser.removeActionListener(al);
+        for (java.awt.event.ActionListener al : deleteUser.getActionListeners()) deleteUser.removeActionListener(al);
+
         for (Component c : contentPanel.getComponents()) {
             if (c instanceof JScrollPane) {
                 contentPanel.remove(c);
@@ -174,7 +186,7 @@ public class AdminDashboard extends JFrame {
         }
 
         String[] headerList = getUserHeader(userRole);
-        DefaultTableModel model = new DefaultTableModel(headerList, 0) {
+        model = new DefaultTableModel(headerList, 0) {
             @Override
             public boolean isCellEditable(int r, int c) {
                 return false;
@@ -207,13 +219,287 @@ public class AdminDashboard extends JFrame {
         JTable userTable = new JTable(model);
         userTable.setRowHeight(32);
         userTable.setFont(Theme.FONT_BODY);
+        userTable.getSelectionModel().addListSelectionListener(e -> {
+            int selectedRow = userTable.getSelectedRow();
+            if(selectedRow != -1) {
+                Object id = userTable.getValueAt(selectedRow,0);
+                this.selectedUserId = String.valueOf(id);
+                editUser.setEnabled(true);
+                deleteUser.setEnabled(true);
+            } else {
+                editUser.setEnabled(false);
+                deleteUser.setEnabled(false);
+            }
+        });
 
         JScrollPane scrollPaneTable = new JScrollPane(userTable);
         scrollPaneTable.setBounds(10, 85, 870, 500); 
         contentPanel.add(scrollPaneTable);
 
+        addUser.addActionListener(e -> {
+            System.out.println(userRole);
+            addUpdateUserForm(contentPanel, userRole, this.selectedUserId, "add");
+        });
+        editUser.addActionListener(e -> {
+            System.out.println(userRole);
+            addUpdateUserForm(contentPanel, userRole, this.selectedUserId, "update");
+        });
+        deleteUser.addActionListener(e -> {
+            String action = "delete";
+            String status = "";
+
+            if (userRole.equals("Admin")) {
+                status = aS.writeAdmin(action, Integer.parseInt(this.selectedUserId), "", "", "", false, "", "", 0);
+            } else if (userRole.equals("Medical Manager")) {
+                status = aS.deleteMedicalManager(this.selectedUserId);
+            } else if (userRole.equals("Doctor")) {
+                status = aS.deleteDoctor(this.selectedUserId);
+            } else if (userRole.equals("Patient")) {
+                status = aS.removePatient(this.selectedUserId);
+            } else {
+                status = "Delete action not successful";
+            }
+
+            JLabel statusCRUD = new JLabel();
+            statusCRUD.setText(status);
+            statusCRUD.setBounds(700,7,160,30);
+            statusCRUD.setFont(Theme.FONT_BODY);
+            contentPanel.add(statusCRUD);
+            if (status.equals("Delete action not successful") || status.equals("Admin file not found") || status.equals("Error updating the admin list")) {
+                statusCRUD.setForeground(new Color(255,0,0));
+            } else {
+                statusCRUD.setForeground(new Color(0,255,0)); 
+            }
+
+        });        
+
         contentPanel.revalidate();
         contentPanel.repaint();
     }
 
+    private void addUpdateUserForm(JPanel contentPanel, String userRole, String selectedId, String action) {
+        contentPanel.removeAll();
+        contentPanel.setLayout(null);
+
+        JLabel formTitle = new JLabel(action.toUpperCase() + " " + userRole.toUpperCase() + " ACCOUNT");
+        formTitle.setFont(Theme.FONT_HEADING);
+        formTitle.setBounds(10, 5, 500, 30);
+        contentPanel.add(formTitle);
+
+        JLabel lbl1 = new JLabel("Name / User:"); lbl1.setBounds(10, 60, 120, 25); contentPanel.add(lbl1);
+        JTextField txtName = new JTextField(); txtName.setBounds(140, 60, 250, 25); contentPanel.add(txtName);
+
+        JLabel lbl2 = new JLabel("Email Address:"); lbl2.setBounds(10, 100, 120, 25); contentPanel.add(lbl2);
+        JTextField txtEmail = new JTextField(); txtEmail.setBounds(140, 100, 250, 25); contentPanel.add(txtEmail);
+
+        JLabel lbl3 = new JLabel("Password:"); lbl3.setBounds(10, 140, 120, 25); contentPanel.add(lbl3);
+        JTextField txtPass = new JTextField(); txtPass.setBounds(140, 140, 250, 25); contentPanel.add(txtPass);
+
+        JLabel lbl4 = new JLabel("Phone Number:"); lbl4.setBounds(10, 180, 120, 25); contentPanel.add(lbl4);
+        JTextField txtPhone = new JTextField(); txtPhone.setBounds(140, 180, 250, 25); contentPanel.add(txtPhone);
+
+        JTextField txtAdminFirstName = new JTextField();
+        JTextField txtAdminLastName = new JTextField();
+        JTextField txtAdminSalary = new JTextField();
+
+        JTextField txtMgrDeptId = new JTextField();
+
+        JTextField txtDocSpecialty = new JTextField();
+        JTextField txtDocDeptId = new JTextField();
+        JTextField txtDocMgrId = new JTextField();
+        JTextField txtDocFee = new JTextField();
+        JComboBox<String> cmbDocShift = new JComboBox<>(new String[]{"Morning", "Afternoon", "Night"});
+
+        JComboBox<String> cmbPatBlood = new JComboBox<>(new String[]{"A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"});
+        JTextField txtPatAllergies = new JTextField();
+        JTextField txtPatEmergency = new JTextField();
+        JComboBox<String> cmbPatInsurance = new JComboBox<>();
+
+        InsuranceService iS = new InsuranceService();
+        for (Insurance ins : iS.getInsuranceList()) {
+            System.out.print(ins.getInsuranceName());
+            cmbPatInsurance.addItem(ins.getInsuranceName());
+        }
+        if (cmbPatInsurance.getItemCount() == 0) {
+            cmbPatInsurance.addItem("None");
+        }
+
+        int currentY = 220;
+
+        switch (userRole) {
+            case "Admin":
+                lbl4.setVisible(false);
+                txtPhone.setVisible(false);
+                currentY = 180;
+                
+                JLabel lblAdmin1 = new JLabel("First Name:"); lblAdmin1.setBounds(10, currentY, 120, 25);
+                txtAdminFirstName.setBounds(140, currentY, 250, 25);
+                contentPanel.add(lblAdmin1); contentPanel.add(txtAdminFirstName);
+                currentY += 40;
+
+                JLabel lblAdmin2 = new JLabel("Last Name:"); lblAdmin2.setBounds(10, currentY, 120, 25);
+                txtAdminLastName.setBounds(140, currentY, 250, 25);
+                contentPanel.add(lblAdmin2); contentPanel.add(txtAdminLastName);
+                currentY += 40;
+
+                JLabel lblAdmin3 = new JLabel("Salary (RM):"); lblAdmin3.setBounds(10, currentY, 120, 25);
+                txtAdminSalary.setBounds(140, currentY, 250, 25);
+                contentPanel.add(lblAdmin3); contentPanel.add(txtAdminSalary);
+                currentY += 40;
+                break;
+                
+            case "Medical Manager":
+                JLabel lblMgr1 = new JLabel("Department ID:"); lblMgr1.setBounds(10, currentY, 120, 25);
+                txtMgrDeptId.setBounds(140, currentY, 250, 25);
+                contentPanel.add(lblMgr1); contentPanel.add(txtMgrDeptId);
+                currentY += 40;
+                break;
+                
+            case "Doctor":
+                JLabel lblDoc1 = new JLabel("Specialty:"); lblDoc1.setBounds(10, currentY, 120, 25);
+                txtDocSpecialty.setBounds(140, currentY, 250, 25);
+                contentPanel.add(lblDoc1); contentPanel.add(txtDocSpecialty);
+                currentY += 40;
+
+                JLabel lblDoc2 = new JLabel("Department ID:"); lblDoc2.setBounds(10, currentY, 120, 25);
+                txtDocDeptId.setBounds(140, currentY, 250, 25);
+                contentPanel.add(lblDoc2); contentPanel.add(txtDocDeptId);
+                currentY += 40;
+
+                JLabel lblDoc3 = new JLabel("Manager ID:"); lblDoc3.setBounds(10, currentY, 120, 25);
+                txtDocMgrId.setBounds(140, currentY, 250, 25);
+                contentPanel.add(lblDoc3); contentPanel.add(txtDocMgrId);
+                currentY += 40;
+
+                JLabel lblDoc4 = new JLabel("Consultation Fee:"); lblDoc4.setBounds(10, currentY, 120, 25);
+                txtDocFee.setBounds(140, currentY, 250, 25);
+                contentPanel.add(lblDoc4); contentPanel.add(txtDocFee);
+                currentY += 40;
+                
+                JLabel lblDoc5 = new JLabel("Shift Time:"); lblDoc5.setBounds(10, currentY, 120, 25);
+                cmbDocShift.setBounds(140, currentY, 250, 25);
+                contentPanel.add(lblDoc5); contentPanel.add(cmbDocShift);
+                currentY += 40;
+                break;
+                
+            case "Patient":
+                JLabel lblPat1 = new JLabel("Blood Type:"); lblPat1.setBounds(10, currentY, 120, 25);
+                cmbPatBlood.setBounds(140, currentY, 250, 25);
+                contentPanel.add(lblPat1); contentPanel.add(cmbPatBlood);
+                currentY += 40;
+
+                JLabel lblPat2 = new JLabel("Allergies:"); lblPat2.setBounds(10, currentY, 120, 25);
+                txtPatAllergies.setBounds(140, currentY, 250, 25);
+                contentPanel.add(lblPat2); contentPanel.add(txtPatAllergies);
+                currentY += 40;
+
+                JLabel lblPat3 = new JLabel("Insurance:"); lblPat3.setBounds(10, currentY, 120, 25);
+                cmbPatInsurance.setBounds(140, currentY, 250, 25);
+                contentPanel.add(lblPat3); contentPanel.add(cmbPatInsurance);
+                currentY += 40;
+
+                JLabel lblPat4 = new JLabel("Emergency Contact:"); lblPat4.setBounds(10, currentY, 120, 25);
+                txtPatEmergency.setBounds(140, currentY, 250, 25);
+                contentPanel.add(lblPat4); contentPanel.add(txtPatEmergency);
+                currentY += 40;
+                break;
+        }
+
+        if (action.equals("update") && selectedId != null) {
+            if (userRole.equals("Admin")) {
+                for (model.Admin a : aS.getAdminList()) {
+                    if (String.valueOf(a.getUserId()).equals(selectedId)) {
+                        txtName.setText(a.getUserName()); 
+                        txtEmail.setText(a.getUserEmail());
+                        txtPass.setText(a.getUserHashPassword()); 
+                        txtAdminFirstName.setText(a.getAdminFirstName());
+                        txtAdminLastName.setText(a.getAdminLastName());
+                        txtAdminSalary.setText(String.valueOf(a.getAdminSalary())); 
+                        break;
+                    }
+                }
+            } else if (userRole.equals("Medical Manager")) {
+                for (model.MedicalManager m : aS.getMedicalManager()) {
+                    if (m.getId().equals(selectedId)) {
+                        txtName.setText(m.getName());
+                        txtEmail.setText(m.getEmail());
+                        txtPass.setText(m.getPassword());
+                        txtPhone.setText(m.getPhone());
+                        txtMgrDeptId.setText(m.getManagedDepartmentId());
+                        break;
+                    }
+                }
+            } else if (userRole.equals("Doctor")) {
+                for (model.Doctor d : aS.getDoctors()) {
+                    if (d.getId().equals(selectedId)) {
+                        txtName.setText(d.getName());
+                        txtEmail.setText(d.getEmail());
+                        txtPass.setText(d.getPassword());
+                        txtPhone.setText(d.getPhone());
+                        txtDocSpecialty.setText(d.getSpecialty());
+                        txtDocDeptId.setText(d.getDepartmentId());
+                        txtDocMgrId.setText(d.getManagerId());
+                        txtDocFee.setText(String.valueOf(d.getConsultationFee()));
+                        cmbDocShift.setSelectedItem(d.getShift());
+                        break;
+                    }
+                }
+            } else if (userRole.equals("Patient")) {
+                for (model.Patient p : aS.getPatient()) {
+                    if (p.getId().equals(selectedId)) {
+                        txtName.setText(p.getName());
+                        txtEmail.setText(p.getEmail());
+                        txtPass.setText(p.getPassword());
+                        txtPhone.setText(p.getPhone());
+                        cmbPatBlood.setSelectedItem(p.getBloodType());
+                        txtPatAllergies.setText(p.getAllergies());
+                        cmbPatInsurance.setSelectedItem(p.getInsuranceProvider());
+                        txtPatEmergency.setText(p.getEmergencyContact());
+                        break;
+                    }
+                }
+            }
+        }
+
+        JButton btnSubmit = new JButton(action.equals("add") ? "Save Entry" : "Apply Changes");
+        btnSubmit.setBounds(140, currentY + 10, 120, 30);
+        btnSubmit.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        btnSubmit.addActionListener(e -> {
+            if (action.equals("add")) {
+                if (userRole.equals("Admin")) {
+                    int nextId = aS.getLatestAdminId();
+                    aS.appendAdmin(nextId, txtName.getText(), txtEmail.getText(), txtPass.getText(), true, txtAdminFirstName.getText(), txtAdminLastName.getText(), Double.parseDouble(txtAdminSalary.getText()));
+                } else if (userRole.equals("Medical Manager")) {
+                    String nextMgrId = "MGR-" + String.format("%03d", aS.getMedicalManager().size() + 1);
+                    aS.saveMedicalManager(nextMgrId, txtName.getText(), txtEmail.getText(), txtPhone.getText(), txtPass.getText(), txtMgrDeptId.getText());
+                } else if (userRole.equals("Doctor")) {
+                    String nextDocId = "DOC-" + String.format("%03d", aS.getDoctors().size() + 1);
+                    aS.saveDoctor(nextDocId, txtName.getText(), txtEmail.getText(), txtPhone.getText(), txtPass.getText(), txtDocSpecialty.getText(), txtDocDeptId.getText(), txtDocMgrId.getText(), Double.parseDouble(txtDocFee.getText()), cmbDocShift.getSelectedItem().toString());
+                } else if (userRole.equals("Patient")) {
+                    String nextPatId = "PAT-" + String.format("%03d", aS.getPatient().size() + 1);
+                    aS.addPatient(nextPatId, txtName.getText(), txtEmail.getText(), txtPhone.getText(), txtPass.getText(), cmbPatBlood.getSelectedItem().toString(), txtPatAllergies.getText(), cmbPatInsurance.getSelectedItem().toString(), txtPatEmergency.getText());
+                }
+            } else {
+                if (userRole.equals("Admin")) {
+                    aS.writeAdmin("update", Integer.parseInt(selectedId), txtName.getText(), txtEmail.getText(), txtPass.getText(), true, txtAdminFirstName.getText(), txtAdminLastName.getText(), Double.parseDouble(txtAdminSalary.getText()));
+                } else if (userRole.equals("Medical Manager")) {
+                    aS.saveMedicalManager(selectedId, txtName.getText(), txtEmail.getText(), txtPhone.getText(), txtPass.getText(), txtMgrDeptId.getText());
+                } else if (userRole.equals("Doctor")) {
+                    aS.saveDoctor(selectedId, txtName.getText(), txtEmail.getText(), txtPhone.getText(), txtPass.getText(), txtDocSpecialty.getText(), txtDocDeptId.getText(), txtDocMgrId.getText(), Double.parseDouble(txtDocFee.getText()), cmbDocShift.getSelectedItem().toString());
+                } else if (userRole.equals("Patient")) {
+                    aS.addPatient(selectedId, txtName.getText(), txtEmail.getText(), txtPhone.getText(), txtPass.getText(), cmbPatBlood.getSelectedItem().toString(), txtPatAllergies.getText(), cmbPatInsurance.getSelectedItem().toString(), txtPatEmergency.getText());
+                }
+            }
+        });
+        contentPanel.add(btnSubmit);
+
+        JButton btnBack = new JButton("Cancel");
+        btnBack.setBounds(270, currentY + 10, 100, 30);
+        btnBack.addActionListener(e -> displayUserTable(contentPanel));
+        contentPanel.add(btnBack);
+
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
 }
