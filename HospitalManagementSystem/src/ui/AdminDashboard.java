@@ -1,23 +1,20 @@
 package ui;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 import model.Admin;
+import model.Doctor;
+import model.MedicalManager;
+import model.Patient;
+import service.AdminService;
 import util.Theme;
-import util.Validation;
 
-/*I just modify what my teammate gave me*/
 
 public class AdminDashboard extends JFrame {
 
     private Admin currentUser;
-    private JPanel contentPanel;
-    private CardLayout cardLayout;
-    private String activeCard = "HOME";
-    private List<JButton> navButtons = new ArrayList<>();
+    private AdminService aS = new AdminService();
 
     public AdminDashboard(Admin user) {
         this.currentUser = user;
@@ -26,171 +23,197 @@ public class AdminDashboard extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1100, 700);
         setMinimumSize(new Dimension(900, 600));
-        Theme.styleFrame(this);
+        setLayout(null);
+        setResizable(false);
+        
+        JPanel headerPanel = new JPanel();
+        headerPanel.setBackground(new Color(51, 65, 85));
+        headerPanel.setBounds(0,0,1100,55);
+        headerPanel.setLayout(null);
+        add(headerPanel);
 
-        JPanel root = new JPanel(new BorderLayout());
-        root.setBackground(Theme.BG);
-        root.add(buildSidebar(), BorderLayout.WEST);
+        JLabel headerLeftLabel = new JLabel();
+        headerLeftLabel.setText("HMS" + " " + "-" + " " + user.getAdminFirstName() + " " + user.getAdminLastName());
+        headerLeftLabel.setForeground(new Color(255,255,255));
+        headerLeftLabel.setFont(Theme.FONT_TITLE);
+        headerLeftLabel.setBounds(20,15,300,20);
+        headerPanel.add(headerLeftLabel);
 
-        cardLayout = new CardLayout();
-        contentPanel = new JPanel(cardLayout);
+        JButton logoutButton = new JButton();
+        logoutButton.setText("Log out");
+        logoutButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        logoutButton.setBounds(980,17,90,20);
+        logoutButton.addActionListener( e -> {dispose(); SwingUtilities.invokeLater(() -> new LoginFrame().setVisible(true));});
+        headerPanel.add(logoutButton);
+
+        JPanel navPanel = new JPanel();
+        navPanel.setBackground(new Color(0x335255));
+        navPanel.setBounds(0,55,200,645);
+        navPanel.setLayout(null);
+        add(navPanel);
+
+        JButton userManagement = new JButton();
+        userManagement.setText("Manage Users");
+        userManagement.setBounds(20, 40, 157,34);
+        userManagement.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        navPanel.add(userManagement);
+
+        JButton manageDoctor = new JButton();
+        manageDoctor.setText("Manage Doctors");
+        manageDoctor.setBounds(20, 124, 157,34);
+        manageDoctor.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        navPanel.add(manageDoctor);   
+
+        JButton manageRoom = new JButton();
+        manageRoom.setText("Manage Rooms & Assets");
+        manageRoom.setBounds(20, 208, 157,34);
+        manageRoom.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        navPanel.add(manageRoom);
+
+        JButton manageInsurance = new JButton();
+        manageInsurance.setText("Insurance & Base Rate");
+        manageInsurance.setBounds(20, 297, 157,34);
+        manageInsurance.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        navPanel.add(manageInsurance);
+
+        JPanel contentPanel = new JPanel();
         contentPanel.setBackground(Theme.BG);
-        contentPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        contentPanel.setBounds(200,55,900,645);
+        contentPanel.setLayout(null);
+        add(contentPanel);
+        
+        userManagement.addActionListener(e -> displayUserTable(contentPanel));
 
-        contentPanel.add(buildHomePanel(), "HOME");
-        contentPanel.add(buildPlaceholderPanel("Manage Users", "Teammate: implement this panel. Same Theme + scroll pattern as Doctor module."), "USERS");
-        contentPanel.add(buildPlaceholderPanel("Assign Doctors", "Teammate: implement this panel. Same Theme + scroll pattern as Doctor module."), "ASSIGN");
-        contentPanel.add(buildPlaceholderPanel("Hospital Assets", "Teammate: implement this panel. Same Theme + scroll pattern as Doctor module."), "ASSETS");
-        contentPanel.add(buildPlaceholderPanel("Rates & Insurance", "Teammate: implement this panel. Same Theme + scroll pattern as Doctor module."), "RATES");
-
-        root.add(contentPanel, BorderLayout.CENTER);
-        setContentPane(root);
-        setLocationRelativeTo(null);
-
-        cardLayout.show(contentPanel, "HOME");
+        displayUserTable(contentPanel);
     }
 
-    private JPanel buildSidebar() {
-        JPanel side = new JPanel();
-        side.setPreferredSize(new Dimension(248, 0));
-        side.setBackground(Theme.SIDEBAR);
-        side.setLayout(new BoxLayout(side, BoxLayout.Y_AXIS));
-        side.setBorder(new EmptyBorder(28, 18, 24, 18));
+    private void displayUserTable(JPanel contentPanel) {
+        contentPanel.removeAll();
 
-        JLabel brand = new JLabel("HMS");
-        brand.setFont(Theme.FONT_HEADING);
-        brand.setForeground(Color.WHITE);
-        brand.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel title = new JLabel();
+        title.setText("User management page");
+        title.setBounds(10, 5, 220, 30);
+        title.setFont(Theme.FONT_HEADING);
+        contentPanel.add(title);
 
-        JLabel roleLbl = new JLabel("Admin Portal");
-        roleLbl.setFont(Theme.FONT_SMALL);
-        roleLbl.setForeground(Theme.SIDEBAR_MUTED);
-        roleLbl.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel roleType = new JLabel();
+        roleType.setText("Role selected: ");
+        roleType.setFont(Theme.FONT_BODY);
+        roleType.setBounds(10, 50, 100, 30);
+        contentPanel.add(roleType);
 
-        side.add(brand);
-        side.add(Box.createVerticalStrut(4));
-        side.add(roleLbl);
-        side.add(Box.createVerticalStrut(24));
+        String[] roles = {"Admin","Medical Manager","Doctor","Patient"};
+        JComboBox<String> rolesDropDown = new JComboBox<>(roles);
+        rolesDropDown.setBounds(110,52, 140,25 );
+        contentPanel.add(rolesDropDown);
 
-        side.add(navButton("Home", "HOME"));
-        side.add(Box.createVerticalStrut(6));
-        side.add(navButton("Manage Users", "USERS"));
-        side.add(Box.createVerticalStrut(6));
-        side.add(navButton("Assign Doctors", "ASSIGN"));
-        side.add(Box.createVerticalStrut(6));
-        side.add(navButton("Hospital Assets", "ASSETS"));
-        side.add(Box.createVerticalStrut(6));
-        side.add(navButton("Rates & Insurance", "RATES"));
-        side.add(Box.createVerticalStrut(6));
 
-        side.add(Box.createVerticalGlue());
+        JButton addUser = new JButton();
+        addUser.setText("Add User");
+        addUser.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        addUser.setBounds(580,52, 100, 25);
+        contentPanel.add(addUser);
 
-        JLabel userLbl = new JLabel(currentUser.getAdminFirstName() + " " + currentUser.getAdminLastName());
-        userLbl.setFont(Theme.FONT_SMALL);
-        userLbl.setForeground(Theme.SIDEBAR_TEXT);
-        userLbl.setAlignmentX(Component.LEFT_ALIGNMENT);
-        side.add(userLbl);
-        side.add(Box.createVerticalStrut(10));
+        JButton editUser = new JButton();
+        editUser.setText("Edit User");
+        editUser.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        editUser.setBounds(680,52, 100, 25);
+        editUser.setEnabled(false);
+        contentPanel.add(editUser);
 
-        JButton logoutBtn = new JButton("Logout");
-        logoutBtn.setFont(Theme.FONT_BUTTON);
-        logoutBtn.setForeground(Color.WHITE);
-        logoutBtn.setBackground(new Color(51, 65, 85));
-        logoutBtn.setFocusPainted(false);
-        logoutBtn.setBorderPainted(false);
-        logoutBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        logoutBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
-        logoutBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
-        logoutBtn.addActionListener(e -> {
-            if (Validation.confirm(this, "Logout?")) {
-                dispose();
-                SwingUtilities.invokeLater(() -> new LoginFrame().setVisible(true));
+        JButton deleteUser = new JButton();
+        deleteUser.setText("Delete User");
+        deleteUser.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        deleteUser.setBounds(780,52, 100, 25);
+        deleteUser.setEnabled(false);
+        contentPanel.add(deleteUser);
+
+        String userRole = (String) rolesDropDown.getSelectedItem();
+        loadTable(contentPanel, userRole);
+
+        addUser.addActionListener(e -> {});
+        editUser.addActionListener(e -> {});
+        deleteUser.addActionListener(e -> {});
+        rolesDropDown.addActionListener(e -> loadTable(contentPanel, (String) rolesDropDown.getSelectedItem()));
+
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+
+    private String[] getUserHeader(String userRole) {
+        String[] userHeader;
+        if (userRole.equals("Admin")) {
+            String header = "user_id,user_name,user_email,user_hash_password,admin_first_name,admin_last_name,admin_salary,is_active";
+            userHeader = header.split(",");
+            return userHeader;
+        } else if (userRole.equals("Medical Manager")) {
+            String header = "id|name|email|phone|password|role|managedDepartmentId|active";
+            userHeader = header.split("\\|");
+            return userHeader;
+        } else if (userRole.equals("Doctor")) {
+            String header = "id|name|email|phone|password|role|specialty|departmentId|managerId|fee|shift|active";
+            userHeader = header.split("\\|");
+            return userHeader;            
+        } else if (userRole.equals("Patient")) {
+            String header = "id|name|email|phone|password|role|bloodType|allergies|insuranceProvider|emergencyContact";
+            userHeader = header.split("\\|");
+            return userHeader;
+        } else {
+            String header = "user_id,user_name,user_email,user_hash_password,admin_first_name,admin_last_name,admin_salary,is_active";
+            userHeader = header.split(",");
+            return userHeader;
+        }
+    }
+
+    private void loadTable(JPanel contentPanel, String userRole) {
+        for (Component c : contentPanel.getComponents()) {
+            if (c instanceof JScrollPane) {
+                contentPanel.remove(c);
             }
-        });
-        side.add(logoutBtn);
-        return side;
+        }
+
+        String[] headerList = getUserHeader(userRole);
+        DefaultTableModel model = new DefaultTableModel(headerList, 0) {
+            @Override
+            public boolean isCellEditable(int r, int c) {
+                return false;
+            }            
+        };
+
+        if (userRole.equals("Admin")) {
+            for (Admin a: aS.getAdminList()) {
+                model.addRow(new Object[]{a.getUserId(),a.getUserName(),a.getUserEmail(),a.getUserHashPassword(),a.getAdminFirstName(),a.getAdminLastName(),a.getAdminSalary(),a.getIsActive()});
+            }
+        } else if (userRole.equals("Medical Manager")) {
+            for (MedicalManager a: aS.getMedicalManager()) {
+                model.addRow(new Object[]{a.getId(),a.getName(),a.getEmail(),a.getPhone(),a.getPassword(),a.getRole(),a.getManagedDepartmentId(),a.isActive()});
+            }
+        } else if (userRole.equals("Doctor")) {
+            for (Doctor a: aS.getDoctors()) {
+                model.addRow(new Object[]{a.getId(),a.getName(),a.getEmail(),a.getPhone(),a.getPassword(),a.getRole(),a.getSpecialty(),a.getDepartmentId(),a.getManagerId(),a.getConsultationFee(),a.getShift(),a.isActive()});
+            }
+           
+        } else if (userRole.equals("Patient")) {
+            for (Patient a: aS.getPatient()) {
+                model.addRow(new Object[]{a.getId(),a.getName(),a.getEmail(),a.getPhone(),a.getPassword(),a.getRole(),a.getBloodType(),a.getAllergies(),a.getInsuranceProvider(),a.getEmergencyContact()});
+            }
+        } else {
+            for (Admin a: aS.getAdminList()) {
+                model.addRow(new Object[]{a.getUserId(),a.getUserName(),a.getUserEmail(),a.getUserHashPassword(),a.getAdminFirstName(),a.getAdminLastName(),a.getAdminSalary(),a.getIsActive()});
+            }
+        }
+
+        JTable userTable = new JTable(model);
+        userTable.setRowHeight(32);
+        userTable.setFont(Theme.FONT_BODY);
+
+        JScrollPane scrollPaneTable = new JScrollPane(userTable);
+        scrollPaneTable.setBounds(10, 85, 870, 500); 
+        contentPanel.add(scrollPaneTable);
+
+        contentPanel.revalidate();
+        contentPanel.repaint();
     }
 
-    private JButton navButton(String text, String cardName) {
-        JButton btn = new JButton(text);
-
-        btn.setFont(new Font(Theme.FONT_BODY.getFamily(), Font.BOLD, 13));
-        btn.setForeground(Color.WHITE);
-        btn.setContentAreaFilled(false);
-        btn.setFocusPainted(false);
-        btn.setBorderPainted(false);
-        btn.setOpaque(false);
-        btn.setHorizontalAlignment(SwingConstants.LEFT);
-        btn.setBorder(new EmptyBorder(0, 14, 0, 12));
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
-        btn.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btn.addActionListener(e -> {
-            activeCard = cardName;
-            cardLayout.show(contentPanel, cardName);
-            for (JButton b : navButtons) b.repaint();
-        });
-        navButtons.add(btn);
-        return btn;
-    }
-
-    private JPanel buildHomePanel() {
-        JPanel panel = new JPanel(new BorderLayout(0, 16));
-        panel.setOpaque(false);
-
-        JLabel title = new JLabel("Welcome, " + currentUser.getAdminFirstName() + " " + currentUser.getAdminLastName());
-        title.setFont(Theme.FONT_TITLE);
-        title.setForeground(Theme.TEXT_PRIMARY);
-
-        JLabel sub = new JLabel("<html>Admin Staff scaffold. Implement: CRUD users, assign doctors to managers, manage rooms/wards/labs, configure consultation rates & insurance networks.<br/>"
-                + "Use the sidebar to open feature pages. Replace this home panel when ready.</html>");
-        sub.setFont(Theme.FONT_BODY);
-        sub.setForeground(Theme.TEXT_SECONDARY);
-
-        JPanel card = Theme.createCard();
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.add(title);
-        card.add(Box.createVerticalStrut(8));
-        card.add(sub);
-
-        JScrollPane scroll = new JScrollPane(card);
-        scroll.setBorder(BorderFactory.createEmptyBorder());
-        scroll.getViewport().setBackground(Theme.BG);
-
-        panel.add(scroll, BorderLayout.CENTER);
-        return panel;
-    }
-
-    private JPanel buildPlaceholderPanel(String titleText, String hint) {
-        JPanel panel = new JPanel(new BorderLayout(0, 16));
-        panel.setOpaque(false);
-
-        JLabel title = new JLabel(titleText);
-        title.setFont(Theme.FONT_TITLE);
-        title.setForeground(Theme.TEXT_PRIMARY);
-
-        JLabel hintLbl = new JLabel("<html>" + hint + "</html>");
-        hintLbl.setFont(Theme.FONT_BODY);
-        hintLbl.setForeground(Theme.TEXT_SECONDARY);
-
-        JPanel card = Theme.createCard();
-        card.setLayout(new BorderLayout(0, 12));
-        card.add(title, BorderLayout.NORTH);
-        card.add(hintLbl, BorderLayout.CENTER);
-
-        // Empty table shell – teammate fills model/columns
-        String[] cols = {"Column 1", "Column 2", "Column 3", "Column 4"};
-        JTable table = new JTable(new javax.swing.table.DefaultTableModel(cols, 0));
-        table.setRowHeight(36);
-        table.setFont(Theme.FONT_BODY);
-        JScrollPane tableScroll = new JScrollPane(table);
-        tableScroll.setBorder(BorderFactory.createLineBorder(Theme.BORDER, 1, true));
-        card.add(tableScroll, BorderLayout.SOUTH);
-
-        JScrollPane scroll = new JScrollPane(card);
-        scroll.setBorder(BorderFactory.createEmptyBorder());
-        scroll.getViewport().setBackground(Theme.BG);
-        panel.add(scroll, BorderLayout.CENTER);
-        return panel;
-    }
 }
