@@ -42,7 +42,6 @@ public class AdminDashboard extends JFrame {
         contentPanel.add(buildPlaceholderPanel("Assign Doctors", "Teammate: implement this panel. Same Theme + scroll pattern as Doctor module."), "ASSIGN");
         contentPanel.add(buildPlaceholderPanel("Hospital Assets", "Teammate: implement this panel. Same Theme + scroll pattern as Doctor module."), "ASSETS");
         contentPanel.add(buildPlaceholderPanel("Rates & Insurance", "Teammate: implement this panel. Same Theme + scroll pattern as Doctor module."), "RATES");
-        contentPanel.add(buildPlaceholderPanel("My Profile", "Teammate: implement this panel. Same Theme + scroll pattern as Doctor module."), "PROFILE");
 
         root.add(contentPanel, BorderLayout.CENTER);
         setContentPane(root);
@@ -83,8 +82,6 @@ public class AdminDashboard extends JFrame {
         side.add(Box.createVerticalStrut(6));
         side.add(navButton("Rates & Insurance", "RATES"));
         side.add(Box.createVerticalStrut(6));
-        side.add(navButton("My Profile", "PROFILE"));
-        side.add(Box.createVerticalStrut(6));
 
         side.add(Box.createVerticalGlue());
 
@@ -115,23 +112,8 @@ public class AdminDashboard extends JFrame {
     }
 
     private JButton navButton(String text, String cardName) {
-        JButton btn = new JButton(text) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                boolean active = cardName.equals(activeCard);
-                if (active) {
-                    g2.setColor(Theme.SIDEBAR_ACTIVE);
-                    g2.fillRoundRect(0, 4, getWidth(), getHeight() - 8, 10, 10);
-                } else if (getModel().isRollover()) {
-                    g2.setColor(Theme.SIDEBAR_ACCENT);
-                    g2.fillRoundRect(0, 4, getWidth(), getHeight() - 8, 10, 10);
-                }
-                g2.dispose();
-                super.paintComponent(g);
-            }
-        };
+        JButton btn = new JButton(text);
+
         btn.setFont(new Font(Theme.FONT_BODY.getFamily(), Font.BOLD, 13));
         btn.setForeground(Color.WHITE);
         btn.setContentAreaFilled(false);
