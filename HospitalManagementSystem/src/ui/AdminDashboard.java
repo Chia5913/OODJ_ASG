@@ -4,6 +4,8 @@ import model.Admin;
 import util.Theme;
 import util.Validation;
 
+import java.util.List;
+import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -16,12 +18,12 @@ public class AdminDashboard extends JFrame {
     private JPanel contentPanel;
     private CardLayout cardLayout;
     private String activeCard = "HOME";
-    private final java.util.List<JButton> navButtons = new java.util.ArrayList<>();
+    private List<JButton> navButtons = new ArrayList<>();
 
     public AdminDashboard(Admin user) {
         this.currentUser = user;
 
-        setTitle("Admin Portal – " + user.getName());
+        setTitle("Admin Portal – " + user.getAdminFirstName() + " " + user.getAdminLastName());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1100, 700);
         setMinimumSize(new Dimension(900, 600));
