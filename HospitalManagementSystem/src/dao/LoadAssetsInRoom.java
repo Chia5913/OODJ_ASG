@@ -22,8 +22,7 @@ public class LoadAssetsInRoom implements InterfaceLoadAdmin<HospitalAsset>{
     @Override
     public String readLoadFile() {
         assetInRoomList.clear();
-        roomLoader.loadRoom();
-        this.hospitalRoomsList = roomLoader.getRoomsList();
+        this.hospitalRoomsList = roomLoader.getObjectList();
         for (HospitalRoom i : this.hospitalRoomsList) {
             this.roomDesignatedRole = i.getRoomRole();
             this.roomId = i.getDoorNumberId();

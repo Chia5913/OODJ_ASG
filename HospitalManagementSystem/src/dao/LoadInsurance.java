@@ -23,7 +23,7 @@ public class LoadInsurance implements InterfaceLoadAdmin<Insurance>{
                 int insuranceId = Integer.parseInt(data[0].trim());
                 String insuranceName = data[1].trim();
                 boolean insuranceIsActive = Boolean.parseBoolean(data[2].trim());
-                Insurance insuranceListObject = new Insurance(insuranceId, insuraneName, insuranceIsActive);
+                Insurance insuranceListObject = new Insurance(insuranceId, insuranceName, insuranceIsActive);
                 insuranceList.add(insuranceListObject);
             }
         } catch (IOException e) {
