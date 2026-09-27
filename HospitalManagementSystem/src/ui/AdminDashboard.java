@@ -7,11 +7,13 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import model.Admin;
 import model.Doctor;
+import model.HospitalRoom;
 import model.Insurance;
 import model.MedicalManager;
 import model.Patient;
 import service.AdminService;
 import service.InsuranceService;
+import service.RoomService;
 import util.Theme;
 
 
@@ -26,6 +28,9 @@ public class AdminDashboard extends JFrame {
     private DefaultTableModel model;
     private List<Doctor> doctorObjectList = new ArrayList<>();                
     private List<MedicalManager> medicalManagerObjectList = new ArrayList<>();
+    private int selectedFloorNumber;
+    private int selectedRoomId;
+    private RoomService rS = new RoomService();
 
     public AdminDashboard(Admin user) {
         this.currentUser = user;
@@ -96,8 +101,116 @@ public class AdminDashboard extends JFrame {
         
         userManagement.addActionListener(e -> displayUserTable(contentPanel));
         manageDoctor.addActionListener(e -> displayManageDoctor(contentPanel));
+        manageRoom.addActionListener(e -> displayRoom(contentPanel));
 
         displayUserTable(contentPanel);
+    }
+
+    private void displayRoom(JPanel contentPanel) {
+        contentPanel.removeAll();
+
+
+        for (Component c : contentPanel.getComponents()) {
+            if (c instanceof JScrollPane) {
+                contentPanel.remove(c);
+            }
+        }
+
+        JLabel title = new JLabel();
+        title.setText("Room management page");
+        title.setBounds(10, 5, 220, 30);
+        title.setFont(Theme.FONT_HEADING);
+        contentPanel.add(title); 
+
+        JLabel selectFloor = new JLabel();
+        selectFloor.setText("Select Floor: ");
+        selectFloor.setFont(Theme.FONT_BODY);
+        selectFloor.setBounds(10, 50, 80, 30);
+        contentPanel.add(selectFloor);
+
+        String[] floorsList = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39"};
+        JComboBox<String> selectFloorDropDown = new JComboBox<>(floorsList);
+        selectFloorDropDown.setBounds(90,52,60,25);
+        contentPanel.add(selectFloorDropDown);
+
+        JButton addRoom = new JButton();
+        addRoom.setText("Add Room");
+        addRoom.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        addRoom.setBounds(480,52, 100, 25);
+        contentPanel.add(addRoom);
+
+        JButton editRoom = new JButton();
+        editRoom.setText("Edit Room");
+        editRoom.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        editRoom.setBounds(580,52, 100, 25);
+        editRoom.setEnabled(false);
+        contentPanel.add(editRoom);
+
+        JButton deleteRoom = new JButton();
+        deleteRoom.setText("Delete Room");
+        deleteRoom.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        deleteRoom.setBounds(680,52, 100, 25);
+        deleteRoom.setEnabled(false);
+        contentPanel.add(deleteRoom);
+
+        JButton viewAssets = new JButton();
+        viewAssets.setText("View Room");
+        viewAssets.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        viewAssets.setBounds(780,52, 100, 25);
+        viewAssets.setEnabled(false);
+        contentPanel.add(viewAssets);
+
+        this.selectedFloorNumber = Integer.parseInt((String) selectFloorDropDown.getSelectedItem());
+        System.out.println(this.selectedFloorNumber);
+        String roomHeader = "room_door_number_id,room_designated_name,room_role,room_status";
+        String[] roomHeaderList = roomHeader.split(",");
+        DefaultTableModel roomModel = new DefaultTableModel(roomHeaderList, 0) {
+            @Override 
+            public boolean isCellEditable(int r ,  int c) {
+                return false;
+            }
+        };
+
+        List<HospitalRoom> hospitalRoomObjectList = rS.getHospitalRoomList(this.selectedFloorNumber);
+        for (HospitalRoom a: hospitalRoomObjectList) {
+            roomModel.addRow(new Object[] {a.getDoorNumberId(),a.getRoomName(),a.getRoomRole(),a.getRoomStatus()});
+        }
+
+        JTable roomTable = new JTable(roomModel);
+        roomTable.setRowHeight(32);
+        roomTable.getSelectionModel().addListSelectionListener(e -> {
+            int selectedRow = roomTable.getSelectedRow();
+            if(selectedRow != -1) {
+                Object id = roomTable.getValueAt(selectedRow,0);
+                this.selectedRoomId = Integer.parseInt(String.valueOf(id));
+                editRoom.setEnabled(true);
+                deleteRoom.setEnabled(true);
+                viewAssets.setEnabled(true);
+            } else {
+                editRoom.setEnabled(false);
+                deleteRoom.setEnabled(false);
+                viewAssets.setEnabled(false);
+            }
+        });
+        JScrollPane roomScrollPane = new JScrollPane(roomTable);
+        roomScrollPane.setBounds(5, 85, 870,510);
+        contentPanel.add(roomScrollPane);
+
+
+        selectFloorDropDown.addActionListener(e -> {
+            roomModel.setRowCount(0);
+            this.selectedFloorNumber = Integer.parseInt((String) selectFloorDropDown.getSelectedItem());
+            List<HospitalRoom> hospitalRoomObjectList1 = rS.getHospitalRoomList(this.selectedFloorNumber);
+            for (HospitalRoom a: hospitalRoomObjectList1) {
+                roomModel.addRow(new Object[] {a.getDoorNumberId(),a.getRoomName(),a.getRoomRole(),a.getRoomStatus()});
+            }
+            editRoom.setEnabled(false);
+            deleteRoom.setEnabled(false);
+            viewAssets.setEnabled(false);
+        });
+
+        contentPanel.revalidate();
+        contentPanel.repaint();
     }
 
     private void displayManageDoctor(JPanel contentPanel) {
@@ -405,7 +518,6 @@ public class AdminDashboard extends JFrame {
 
     private void addUpdateUserForm(JPanel contentPanel, String userRole, String selectedId, String action) {
         contentPanel.removeAll();
-        contentPanel.setLayout(null);
 
         JLabel formTitle = new JLabel(action.toUpperCase() + " " + userRole.toUpperCase() + " ACCOUNT");
         formTitle.setFont(Theme.FONT_HEADING);
