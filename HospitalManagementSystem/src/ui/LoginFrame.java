@@ -480,10 +480,10 @@ public class LoginFrame extends JFrame {
                 openDashboard(() -> new AdminDashboard(admin).setVisible(true));
                 return;
         } else if (loginStatus.equals("Incorrect password")){
-                Validation.showError(loginStatus);
+                Validation.showError(this, loginStatus);
                 return;
         } else {
-                Validation.showError(loginStatus);
+                Validation.showError(this, loginStatus);
                 return;
         }
 
