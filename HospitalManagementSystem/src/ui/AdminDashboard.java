@@ -1,6 +1,8 @@
 package ui;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import model.Admin;
@@ -22,6 +24,8 @@ public class AdminDashboard extends JFrame {
     private JButton editUser = new JButton();
     private JButton deleteUser = new JButton(); 
     private DefaultTableModel model;
+    private List<Doctor> doctorObjectList = new ArrayList<>();                
+    private List<MedicalManager> medicalManagerObjectList = new ArrayList<>();
 
     public AdminDashboard(Admin user) {
         this.currentUser = user;
@@ -91,8 +95,130 @@ public class AdminDashboard extends JFrame {
         add(contentPanel);
         
         userManagement.addActionListener(e -> displayUserTable(contentPanel));
+        manageDoctor.addActionListener(e -> displayManageDoctor(contentPanel));
 
         displayUserTable(contentPanel);
+    }
+
+    private void displayManageDoctor(JPanel contentPanel) {
+        contentPanel.removeAll();
+        for (Component c : contentPanel.getComponents()) {
+            if (c instanceof JScrollPane) {
+                contentPanel.remove(c);
+            }
+        }
+        
+        JLabel title = new JLabel();
+        title.setText("Doctor management page");
+        title.setBounds(10, 5, 220, 30);
+        title.setFont(Theme.FONT_HEADING);
+        contentPanel.add(title);
+
+        JLabel doctorList = new JLabel();
+        doctorList.setText("Doctor selected: ");
+        doctorList.setFont(Theme.FONT_BODY);
+        doctorList.setBounds(10, 50, 120, 30);
+        contentPanel.add(doctorList);
+
+
+        JComboBox<String> doctorDropDown = new JComboBox<>();
+        this.doctorObjectList = aS.getDoctors();
+        for(Doctor a: this.doctorObjectList) {
+            doctorDropDown.addItem(a.getName());
+        }
+        doctorDropDown.setBounds(140, 50, 180, 30);
+        contentPanel.add(doctorDropDown);
+
+        JLabel managerList = new JLabel();
+        managerList.setText("Manager selected: ");
+        managerList.setFont(Theme.FONT_BODY);
+        managerList.setBounds(330, 50, 120, 30);
+        contentPanel.add(managerList);
+
+
+        JComboBox<String> managerDropDown = new JComboBox<>();
+        this.medicalManagerObjectList = aS.getMedicalManager();
+        for (MedicalManager a: this.medicalManagerObjectList) {
+            managerDropDown.addItem(a.getName());
+        }
+        managerDropDown.setBounds(470, 50, 200, 30);
+        contentPanel.add(managerDropDown);
+    
+        JButton saveDoctorManager = new JButton();
+        saveDoctorManager.setText("Save");
+        saveDoctorManager.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        saveDoctorManager.setBounds(760,52, 80, 30);
+        saveDoctorManager.setEnabled(true);
+        contentPanel.add(saveDoctorManager);
+
+        String[] doctorHeader = getUserHeader("Doctor");
+        DefaultTableModel modelDoctor = new DefaultTableModel(doctorHeader, 0) {
+            @Override 
+            public boolean isCellEditable(int r, int c) {
+                return false;
+            }
+        };
+
+        String[] medicalManagerHeader = getUserHeader("Medical Manager");
+        DefaultTableModel modelMedicalManager = new DefaultTableModel(medicalManagerHeader, 0) {
+            @Override 
+            public boolean isCellEditable(int r, int c) {
+                return false;
+            }
+        };
+
+        JTable doctorTable = new JTable(modelDoctor);
+        doctorTable.setRowHeight(16);
+
+        JScrollPane doctorScrollPane = new JScrollPane(doctorTable);
+        doctorScrollPane.setBounds(5, 90, 885, 245);
+        contentPanel.add(doctorScrollPane);
+
+        JTable medicalManagerTable = new JTable(modelMedicalManager);
+        medicalManagerTable.setRowHeight(16);
+
+        JScrollPane medicalManagerScrollPane = new JScrollPane(medicalManagerTable);
+        medicalManagerScrollPane.setBounds(5, 350 , 885, 245);
+        contentPanel.add(medicalManagerScrollPane);
+
+        this.doctorObjectList = aS.getDoctors();
+        for(Doctor a: this.doctorObjectList) {
+            modelDoctor.addRow(new Object[]{a.getId(),a.getName(),a.getEmail(),a.getPhone(),a.getPassword(),a.getRole(),a.getSpecialty(),a.getDepartmentId(),a.getManagerId(),a.getConsultationFee(),a.getShift(),a.isActive()});
+        }
+
+        this.medicalManagerObjectList = aS.getMedicalManager();
+        for (MedicalManager a: this.medicalManagerObjectList) {
+            modelMedicalManager.addRow(new Object[] {a.getId(),a.getName(),a.getEmail(),a.getPhone(),a.getPassword(),a.getRole(),a.getManagedDepartmentId(),a.isActive()});
+        }
+
+        saveDoctorManager.addActionListener(e -> {
+            String selectedDocName = (String) doctorDropDown.getSelectedItem();
+            String selectedMgrName = (String) managerDropDown.getSelectedItem();
+            this.doctorObjectList = aS.getDoctors();
+            this.medicalManagerObjectList = aS.getMedicalManager();
+
+            Doctor selectedDoctor = null;
+            for (Doctor a : this.doctorObjectList) {
+                if (a.getName().equals(selectedDocName)) {
+                    selectedDoctor = a;
+                    break;
+                }
+            }
+            String selectedManagerId = null;
+            for (MedicalManager a : this.medicalManagerObjectList) {
+                if (a.getName().equals(selectedMgrName)) {
+                    selectedManagerId = a.getId();
+                    break;
+                }
+            }
+            if (selectedDoctor != null && selectedManagerId != null) {
+                String status = aS.saveDoctor(selectedDoctor.getId(),selectedDoctor.getName(),selectedDoctor.getEmail(),selectedDoctor.getPhone(),selectedDoctor.getPassword(),selectedDoctor.getSpecialty(),selectedDoctor.getDepartmentId(),selectedManagerId,selectedDoctor.getConsultationFee(),selectedDoctor.getShift());            
+            }
+            displayManageDoctor(contentPanel);
+        });
+
+        contentPanel.revalidate();
+        contentPanel.repaint();
     }
 
     private void displayUserTable(JPanel contentPanel) {
@@ -302,11 +428,24 @@ public class AdminDashboard extends JFrame {
         JTextField txtAdminLastName = new JTextField();
         JTextField txtAdminSalary = new JTextField();
 
-        JTextField txtMgrDeptId = new JTextField();
+        dao.DepartmentFile deptFile = new dao.DepartmentFile();
+        List<model.Department> deptList = deptFile.getAll();
+        List<MedicalManager> mgrList = aS.getMedicalManager();
+
+        JComboBox<String> cmbMgrDept = new JComboBox<>();
+        JComboBox<String> cmbDocDept = new JComboBox<>();
+        for (model.Department d : deptList) {
+            String deptEntry = d.getDepartmentId() + " - " + d.getName();
+            cmbMgrDept.addItem(deptEntry);
+            cmbDocDept.addItem(deptEntry);
+        }
+
+        JComboBox<String> cmbDocMgr = new JComboBox<>();
+        for (MedicalManager m : mgrList) {
+            cmbDocMgr.addItem(m.getId() + " - " + m.getName());
+        }
 
         JTextField txtDocSpecialty = new JTextField();
-        JTextField txtDocDeptId = new JTextField();
-        JTextField txtDocMgrId = new JTextField();
         JTextField txtDocFee = new JTextField();
         JComboBox<String> cmbDocShift = new JComboBox<>(new String[]{"Morning", "Afternoon", "Night"});
 
@@ -317,7 +456,6 @@ public class AdminDashboard extends JFrame {
 
         InsuranceService iS = new InsuranceService();
         for (Insurance ins : iS.getInsuranceList()) {
-            System.out.print(ins.getInsuranceName());
             cmbPatInsurance.addItem(ins.getInsuranceName());
         }
         if (cmbPatInsurance.getItemCount() == 0) {
@@ -349,9 +487,9 @@ public class AdminDashboard extends JFrame {
                 break;
                 
             case "Medical Manager":
-                JLabel lblMgr1 = new JLabel("Department ID:"); lblMgr1.setBounds(10, currentY, 120, 25);
-                txtMgrDeptId.setBounds(140, currentY, 250, 25);
-                contentPanel.add(lblMgr1); contentPanel.add(txtMgrDeptId);
+                JLabel lblMgr1 = new JLabel("Department:"); lblMgr1.setBounds(10, currentY, 120, 25);
+                cmbMgrDept.setBounds(140, currentY, 250, 25);
+                contentPanel.add(lblMgr1); contentPanel.add(cmbMgrDept);
                 currentY += 40;
                 break;
                 
@@ -361,14 +499,14 @@ public class AdminDashboard extends JFrame {
                 contentPanel.add(lblDoc1); contentPanel.add(txtDocSpecialty);
                 currentY += 40;
 
-                JLabel lblDoc2 = new JLabel("Department ID:"); lblDoc2.setBounds(10, currentY, 120, 25);
-                txtDocDeptId.setBounds(140, currentY, 250, 25);
-                contentPanel.add(lblDoc2); contentPanel.add(txtDocDeptId);
+                JLabel lblDoc2 = new JLabel("Department:"); lblDoc2.setBounds(10, currentY, 120, 25);
+                cmbDocDept.setBounds(140, currentY, 250, 25);
+                contentPanel.add(lblDoc2); contentPanel.add(cmbDocDept);
                 currentY += 40;
 
-                JLabel lblDoc3 = new JLabel("Manager ID:"); lblDoc3.setBounds(10, currentY, 120, 25);
-                txtDocMgrId.setBounds(140, currentY, 250, 25);
-                contentPanel.add(lblDoc3); contentPanel.add(txtDocMgrId);
+                JLabel lblDoc3 = new JLabel("Manager:"); lblDoc3.setBounds(10, currentY, 120, 25);
+                cmbDocMgr.setBounds(140, currentY, 250, 25);
+                contentPanel.add(lblDoc3); contentPanel.add(cmbDocMgr);
                 currentY += 40;
 
                 JLabel lblDoc4 = new JLabel("Consultation Fee:"); lblDoc4.setBounds(10, currentY, 120, 25);
@@ -425,7 +563,13 @@ public class AdminDashboard extends JFrame {
                         txtEmail.setText(m.getEmail());
                         txtPass.setText(m.getPassword());
                         txtPhone.setText(m.getPhone());
-                        txtMgrDeptId.setText(m.getManagedDepartmentId());
+                        String deptId = m.getManagedDepartmentId();
+                        for (int i = 0; i < cmbMgrDept.getItemCount(); i++) {
+                            if (cmbMgrDept.getItemAt(i).startsWith(deptId + " - ")) {
+                                cmbMgrDept.setSelectedIndex(i);
+                                break;
+                            }
+                        }
                         break;
                     }
                 }
@@ -437,8 +581,22 @@ public class AdminDashboard extends JFrame {
                         txtPass.setText(d.getPassword());
                         txtPhone.setText(d.getPhone());
                         txtDocSpecialty.setText(d.getSpecialty());
-                        txtDocDeptId.setText(d.getDepartmentId());
-                        txtDocMgrId.setText(d.getManagerId());
+                        String deptId = d.getDepartmentId();
+                        for (int i = 0; i < cmbDocDept.getItemCount(); i++) {
+                            if (cmbDocDept.getItemAt(i).startsWith(deptId + " - ")) {
+                                cmbDocDept.setSelectedIndex(i);
+                                break;
+                            }
+                        }
+
+                        String mgrId = d.getManagerId();
+                        for (int i = 0; i < cmbDocMgr.getItemCount(); i++) {
+                            if (cmbDocMgr.getItemAt(i).startsWith(mgrId + " - ")) {
+                                cmbDocMgr.setSelectedIndex(i);
+                                break;
+                            }
+                        }
+
                         txtDocFee.setText(String.valueOf(d.getConsultationFee()));
                         cmbDocShift.setSelectedItem(d.getShift());
                         break;
@@ -466,16 +624,20 @@ public class AdminDashboard extends JFrame {
         btnSubmit.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
         btnSubmit.addActionListener(e -> {
+            String mgrDeptId = (cmbMgrDept.getSelectedItem() != null) ? cmbMgrDept.getSelectedItem().toString().split(" - ")[0] : "";
+            String docDeptId = (cmbDocDept.getSelectedItem() != null) ? cmbDocDept.getSelectedItem().toString().split(" - ")[0] : "";
+            String docMgrId = (cmbDocMgr.getSelectedItem() != null) ? cmbDocMgr.getSelectedItem().toString().split(" - ")[0] : "";
+
             if (action.equals("add")) {
                 if (userRole.equals("Admin")) {
                     int nextId = aS.getLatestAdminId();
                     aS.appendAdmin(nextId, txtName.getText(), txtEmail.getText(), txtPass.getText(), true, txtAdminFirstName.getText(), txtAdminLastName.getText(), Double.parseDouble(txtAdminSalary.getText()));
                 } else if (userRole.equals("Medical Manager")) {
                     String nextMgrId = "MGR-" + String.format("%03d", aS.getMedicalManager().size() + 1);
-                    aS.saveMedicalManager(nextMgrId, txtName.getText(), txtEmail.getText(), txtPhone.getText(), txtPass.getText(), txtMgrDeptId.getText());
+                    aS.saveMedicalManager(nextMgrId, txtName.getText(), txtEmail.getText(), txtPhone.getText(), txtPass.getText(), mgrDeptId);
                 } else if (userRole.equals("Doctor")) {
                     String nextDocId = "DOC-" + String.format("%03d", aS.getDoctors().size() + 1);
-                    aS.saveDoctor(nextDocId, txtName.getText(), txtEmail.getText(), txtPhone.getText(), txtPass.getText(), txtDocSpecialty.getText(), txtDocDeptId.getText(), txtDocMgrId.getText(), Double.parseDouble(txtDocFee.getText()), cmbDocShift.getSelectedItem().toString());
+                    aS.saveDoctor(nextDocId, txtName.getText(), txtEmail.getText(), txtPhone.getText(), txtPass.getText(), txtDocSpecialty.getText(), docDeptId, docMgrId, Double.parseDouble(txtDocFee.getText()), cmbDocShift.getSelectedItem().toString());
                 } else if (userRole.equals("Patient")) {
                     String nextPatId = "PAT-" + String.format("%03d", aS.getPatient().size() + 1);
                     aS.addPatient(nextPatId, txtName.getText(), txtEmail.getText(), txtPhone.getText(), txtPass.getText(), cmbPatBlood.getSelectedItem().toString(), txtPatAllergies.getText(), cmbPatInsurance.getSelectedItem().toString(), txtPatEmergency.getText());
@@ -484,13 +646,14 @@ public class AdminDashboard extends JFrame {
                 if (userRole.equals("Admin")) {
                     aS.writeAdmin("update", Integer.parseInt(selectedId), txtName.getText(), txtEmail.getText(), txtPass.getText(), true, txtAdminFirstName.getText(), txtAdminLastName.getText(), Double.parseDouble(txtAdminSalary.getText()));
                 } else if (userRole.equals("Medical Manager")) {
-                    aS.saveMedicalManager(selectedId, txtName.getText(), txtEmail.getText(), txtPhone.getText(), txtPass.getText(), txtMgrDeptId.getText());
+                    aS.saveMedicalManager(selectedId, txtName.getText(), txtEmail.getText(), txtPhone.getText(), txtPass.getText(), mgrDeptId);
                 } else if (userRole.equals("Doctor")) {
-                    aS.saveDoctor(selectedId, txtName.getText(), txtEmail.getText(), txtPhone.getText(), txtPass.getText(), txtDocSpecialty.getText(), txtDocDeptId.getText(), txtDocMgrId.getText(), Double.parseDouble(txtDocFee.getText()), cmbDocShift.getSelectedItem().toString());
+                    aS.saveDoctor(selectedId, txtName.getText(), txtEmail.getText(), txtPhone.getText(), txtPass.getText(), txtDocSpecialty.getText(), docDeptId, docMgrId, Double.parseDouble(txtDocFee.getText()), cmbDocShift.getSelectedItem().toString());
                 } else if (userRole.equals("Patient")) {
                     aS.addPatient(selectedId, txtName.getText(), txtEmail.getText(), txtPhone.getText(), txtPass.getText(), cmbPatBlood.getSelectedItem().toString(), txtPatAllergies.getText(), cmbPatInsurance.getSelectedItem().toString(), txtPatEmergency.getText());
                 }
             }
+            displayUserTable(contentPanel);
         });
         contentPanel.add(btnSubmit);
 
