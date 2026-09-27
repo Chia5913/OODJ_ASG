@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.FileReader;
 import java.io.BufferedReader;
 
-public class LoadMaintenance implements InterfaceLoaderAdmin<HospitalAssetMaintenance>{
+public class LoadMaintenance implements InterfaceLoadAdmin<HospitalAssetMaintenance>{
 
     private String filePath = "data/asset_maintenances.txt";
     private List<HospitalAssetMaintenance> maintenanceList = new ArrayList<>();

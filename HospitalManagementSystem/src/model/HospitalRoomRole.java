@@ -5,7 +5,7 @@ public class HospitalRoomRole {
     private int roomRoleId;
     private String roomRoleName;
 
-    public void HospitalRoomRole(int roomRoleId, String roomRoleName) {
+    public HospitalRoomRole(int roomRoleId, String roomRoleName) {
         this.roomRoleId = roomRoleId;
         this.roomRoleName = roomRoleName;
     }
