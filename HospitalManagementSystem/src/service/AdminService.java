@@ -8,6 +8,7 @@ import dao.DoctorFile;
 import dao.ManagerFile;
 import dao.PatientFile;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import model.Admin;
 import model.Doctor;
 import model.Patient;
@@ -66,17 +67,21 @@ public class AdminService {
     }
 
     private String passwordHasher(String plaintextPassword) {
-        if (plaintextPassword.trim().length() > 16) {
-            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-            byte[] hashedBytes = messageDigest.digest(plaintextPassword.trim().getBytes());
-            StringBuilder stringBuilder = new StringBuilder();
-            for (byte a : hashedBytes) {
-                stringBuilder.append(String.format("%02x", a));
+        try {
+            if (plaintextPassword.trim().length() > 16) {
+                MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+                byte[] hashedBytes = messageDigest.digest(plaintextPassword.trim().getBytes());
+                StringBuilder stringBuilder = new StringBuilder();
+                for (byte a : hashedBytes) {
+                    stringBuilder.append(String.format("%02x", a));
+                }
+                return stringBuilder.toString();
             }
-            return stringBuilder.toString();
-            }
-        } else {
-            return plaintextPassword;
+                        
+        } catch (NoSuchAlgorithmException e) {
+            
+        }
+        return plaintextPassword;
     }
 
 
