@@ -6,14 +6,14 @@ import dao.LoadMaintenance;
 import dao.WriteMaintenance;
 import model.HospitalAssetMaintenance;
 
-public class AssetMaintenanceService {
+public class AssetsMaintenanceService {
 
     private List<HospitalAssetMaintenance> maintenanceList;
     private LoadMaintenance lM = new LoadMaintenance();
     private WriteMaintenance wM = new WriteMaintenance();
     private HospitalAssetMaintenance maintenanceObject;
 
-    public AssetMaintenanceService() {
+    public AssetsMaintenanceService() {
         this.maintenanceList = lM.getObjectList();
     }
 

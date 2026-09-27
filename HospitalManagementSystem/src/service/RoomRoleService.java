@@ -41,6 +41,7 @@ public class RoomRoleService {
         } else {
             return status;
         }
+        return status;
     }
 
     public String updateFile(String action, int selectedRoomRoleId, String roomRoleName) {
@@ -48,16 +49,16 @@ public class RoomRoleService {
         List<HospitalRoomRole> tempList = new ArrayList<>();
         if (action.equals("update")) {
             for (HospitalRoomRole a : this.hospitalRoomRoleObjectList) {
-            if (a.getRoomRoleId() == selectedRoomId) {
-                HospitalRoomRole updatedRoomRole = new HospitalRoomRole(selectedRoomRoleId, roomRoleName);
-                tempList.add(updatedRoomRole);
-            } else {
-                tempList.add(a);
+                if (a.getRoomRoleId() == selectedRoomRoleId) {
+                    HospitalRoomRole updatedRoomRole = new HospitalRoomRole(selectedRoomRoleId, roomRoleName);
+                    tempList.add(updatedRoomRole);
+                } else {
+                    tempList.add(a);
+                }
             }
             this.hospitalRoomRoleObjectList = tempList;
             String status = wRR.writeFile(this.hospitalRoomRoleObjectList);
             return status;
-        }
         } else if (action.equals("delete")) {
             for (HospitalRoomRole a : this.hospitalRoomRoleObjectList) {
                 if (a.getRoomRoleId() == selectedRoomRoleId) {

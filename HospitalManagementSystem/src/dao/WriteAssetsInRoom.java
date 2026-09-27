@@ -28,7 +28,7 @@ public class WriteAssetsInRoom implements InterfaceWriteAdmin<HospitalAsset>{
             bw.write(assetInRoomHeader);
             bw.newLine();
             for (HospitalAsset a: assetInRoomObjectList) {
-                bw.write(a.getAssetId() + "," + a.getAssetName() + "," + a.getAssetYear() + "," + a.getAssetMonth() + "," + a.getAssetDay() + "," + a.getAssetAtRoomId() + "," + a.getAssetMaintenanceId());
+                bw.write(a.getAssetId() + "," + a.getAssetName() + "," + a.getAssetYear() + "," + a.getAssetMonth() + "," + a.getAssetDay() + "," + a.getAssetAtRoomId());
                 bw.newLine();
             }
         } catch (IOException e) {

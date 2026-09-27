@@ -11,8 +11,8 @@ public class WriteConsultRate {
     private String filePath = "data/base_consultation_rate.txt";
 
     public String writeConsultRate(double newConsultRate) {
-        try (BufferedWriter br = new BufferedWriter(new FileWriter(filePath, false))) {
-            br.write(newConsultRate);
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, false))) {
+            bw.write(String.format("%.2f", newConsultRate));
         } catch (IOException e) {
             return "Consultation rate file not found";
         }
