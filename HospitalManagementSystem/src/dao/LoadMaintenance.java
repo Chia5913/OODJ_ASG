@@ -37,13 +37,4 @@ public class LoadMaintenance implements InterfaceLoaderAdmin<HospitalAssetMainte
         return this.maintenanceList;
     }
 
-    public int getLatestMaintenanceId() {
-        int latestId = 0;
-        for (HospitalAssetMaintenance a : maintenanceList) {
-            if (a.getAssetMaintenanceId() > latestId) {
-                latestId = a.getAssetMaintenanceId();
-            }
-        }
-        return latestId + 1;
-    }
 }

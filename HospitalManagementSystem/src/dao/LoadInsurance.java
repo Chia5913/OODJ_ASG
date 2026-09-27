@@ -37,16 +37,5 @@ public class LoadInsurance implements InterfaceLoadAdmin<Insurance>{
         String status = readLoadFile();
         return this.insuranceList;
     }
-
-
-    public int getLatestInsuranceId() {
-        int latestInsuranceId = 0;
-        for (Insurance i : this.insuranceList) {
-            if (i.getInsuranceId() > latestInsuranceId) {
-                latestInsuranceId = i.getInsuranceId();
-            }
-        }
-        return latestInsuranceId + 1;
-    }
     
 }

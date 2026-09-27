@@ -28,7 +28,7 @@ public class LoadAssetsInRoom implements InterfaceLoadAdmin<HospitalAsset>{
             this.roomDesignatedRole = i.getRoomRole();
             this.roomId = i.getDoorNumberId();
             this.roomDesignatedRole = i.getRoomRole();
-            this.filePath = "data/assets_in_room" + this.roomId + "_" + this.roomDesignatedRole.replaceAll("\\s+", "_").toLowerCase() + ".txt";
+            this.filePath = "data/assets_in_room/" + this.roomId + "_" + this.roomDesignatedRole.replaceAll("\\s+", "_").toLowerCase() + ".txt";
             String line;
             try (BufferedReader br = new BufferedReader(new FileReader(this.filePath))) {
                 line = br.readLine();
@@ -40,12 +40,11 @@ public class LoadAssetsInRoom implements InterfaceLoadAdmin<HospitalAsset>{
                     int assetAcquisitionMonth = Integer.parseInt(data[3].trim());
                     int assetAcquisitionDay = Integer.parseInt(data[4].trim());
                     int assetAtRoomId = Integer.parseInt(data[5].trim());
-                    int assetMaintenanceId = Integer.parseInt(data[6].trim());
                     if ((assetAcquisitionYear == 2026) && (assetAcquisitionMonth == 9) && (assetAcquisitionDay == 1)) {
-                        HospitalAsset hospitalAssetObject = new HospitalAsset(assetId, assetName, assetAtRoomId, assetMaintenanceId);
+                        HospitalAsset hospitalAssetObject = new HospitalAsset(assetId, assetName, assetAtRoomId);
                         assetInRoomList.add(hospitalAssetObject);
                     } else {
-                        HospitalAsset hospitalAssetObject = new HospitalAsset(assetId, assetName, assetAcquisitionYear, assetAcquisitionMonth, assetAcquisitionDay, assetAtRoomId, assetMaintenanceId);
+                        HospitalAsset hospitalAssetObject = new HospitalAsset(assetId, assetName, assetAcquisitionYear, assetAcquisitionMonth, assetAcquisitionDay, assetAtRoomId);
                         assetInRoomList.add(hospitalAssetObject);
                     }
                 }
@@ -61,18 +60,5 @@ public class LoadAssetsInRoom implements InterfaceLoadAdmin<HospitalAsset>{
     public List<HospitalAsset> getObjectList() {
         String status = readLoadFile();
         return this.assetInRoomList;
-    }
-
-    public int getLatestAssetIdInRoom(int roomSelectedId) {
-        int latestAssetId = 0;
-        for (HospitalAsset a: assetInRoomList) {
-            int roomId = a.getAssetAtRoomId();
-            if (roomId == roomSelectedId) {
-                if (roomId > latestAssetId) {
-                    latestAssetId = roomId;
-                }
-            }
-        }
-        return latestAssetId + 1;
     }
 }

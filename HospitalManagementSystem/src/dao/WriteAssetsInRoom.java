@@ -9,7 +9,7 @@ import java.util.List;
 public class WriteAssetsInRoom implements InterfaceWriteAdmin<HospitalAsset>{
 
     private String filePath;
-    private String assetInRoomHeader = "asset_id,asset_name,asset_acquisition_year,asset_acquisition_month,asset_acquisition_day,asset_at_room_id,asset_maintenance_id";
+    private String assetInRoomHeader = "asset_id,asset_name,asset_acquisition_year,asset_acquisition_month,asset_acquisition_day,asset_at_room_id";
     
     @Override
     public String writeFile(String assetInRoomString , String filePath) {
@@ -19,7 +19,7 @@ public class WriteAssetsInRoom implements InterfaceWriteAdmin<HospitalAsset>{
         } catch (IOException e) {
             return "Asset in room file not found";
         }
-        return "Asset in room file found";
+        return "Asset in room file successfully updated";
     }
 
     @Override

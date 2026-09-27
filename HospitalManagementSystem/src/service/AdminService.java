@@ -1,17 +1,17 @@
 package service;
-import dao.DoctorFile;
+
+import java.util.List;
+import java.util.ArrayList;
 import dao.LoadAdmin;
+import dao.WriteAdmin;
+import dao.DoctorFile;
 import dao.ManagerFile;
 import dao.PatientFile;
-import dao.WriteAdmin;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
 import model.Admin;
 import model.Doctor;
-import model.MedicalManager;
 import model.Patient;
+import model.MedicalManager;
 
 
 public class AdminService {
@@ -45,17 +45,13 @@ public class AdminService {
 
     public String passwordHasher(String plaintextPassword) {
         if (plaintextPassword.trim().length() > 16) {
-            try {
-                MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-                byte[] hashedBytes = messageDigest.digest(plaintextPassword.trim().getBytes());
-                StringBuilder stringBuilder = new StringBuilder();
-                for (byte a : hashedBytes) {
-                    stringBuilder.append(String.format("%02x", a));
-                }
-                return stringBuilder.toString();
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-                return plaintextPassword; // 兜底返回原密码
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+            byte[] hashedBytes = messageDigest.digest(plaintextPassword.trim().getBytes());
+            StringBuilder stringBuilder = new StringBuilder();
+            for (byte a : hashedBytes) {
+                stringBuilder.append(String.format("%02x", a));
+            }
+            return stringBuilder.toString();
             }
         } else {
             return plaintextPassword;

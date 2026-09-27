@@ -39,19 +39,4 @@ public class LoadRoom implements InterfaceLoadAdmin<HospitalRoom> {
         return this.roomsList; 
     }
 
-
-    public int getLatestRoomId(int selectedFloorNumber) {
-        int latestRoomId = 0;
-        int floorNumber;
-        for (HospitalRoom a : roomsList) {
-            int roomId = a.getDoorNumberId();
-            floorNumber = roomId / 100;
-            if (selectedFloorNumber == floorNumber) {
-                if (roomId > latestRoomId) {
-                    latestRoomId = roomId;
-                }
-            }
-        }
-        return latestRoomId + 1;
-    }
 }

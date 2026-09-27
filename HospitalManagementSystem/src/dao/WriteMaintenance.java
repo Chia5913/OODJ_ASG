@@ -37,7 +37,7 @@ public class WriteMaintenance implements InterfaceWriteAdmin<HospitalAssetMainte
         } catch (IOException e) {
             return "Asset maintenance file not found";
         }
-        return "Asset Maintenance file not found";
+        return "Asset Maintenance file updated";
     }
 
     @Override

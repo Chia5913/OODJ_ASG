@@ -37,13 +37,5 @@ public class LoadRoomRoleList implements InterfaceLoadAdmin<HospitalRoomRole>{
         return this.roomRoleObjectList;
     }
 
-    public int getRoomRoleLatestId() {
-        int latestRoomRoleId = 0;
-        for (HospitalRoomRole a: roomRoleObjectList) {
-            if (a.getRoomRoleId() > latestRoomRoleId) {
-                latestRoomRoleId = a.getRoomRoleId();
-            }
-        }
-        return latestRoomRoleId + 1;
-    }
+
 }
