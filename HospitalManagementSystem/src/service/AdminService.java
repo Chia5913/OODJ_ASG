@@ -21,9 +21,9 @@ public class AdminService {
     private List<Patient> patientList;
     private List<MedicalManager> medicalManagerList;
     private String loginStatus;
+    private LoadAdmin lA = new LoadAdmin();
 
     public AdminService() {
-        LoadAdmin lA = new LoadAdmin();
         this.adminList = lA.getObjectList();
 
     }
@@ -39,7 +39,6 @@ public class AdminService {
     }
 
     public List<Admin> getAdminList() {
-        LoadAdmin lA = new LoadAdmin();
         this.adminList = lA.getObjectList();        
         return this.adminList;
     }
