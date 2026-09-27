@@ -1,14 +1,13 @@
 package ui;
 
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import model.Admin;
 import util.Theme;
 import util.Validation;
-
-import java.util.List;
-import java.util.ArrayList;
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
 
 /*I just modify what my teammate gave me*/
 
@@ -89,7 +88,7 @@ public class AdminDashboard extends JFrame {
 
         side.add(Box.createVerticalGlue());
 
-        JLabel userLbl = new JLabel(currentUser.getName());
+        JLabel userLbl = new JLabel(currentUser.getAdminFirstName() + " " + currentUser.getAdminLastName());
         userLbl.setFont(Theme.FONT_SMALL);
         userLbl.setForeground(Theme.SIDEBAR_TEXT);
         userLbl.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -157,7 +156,7 @@ public class AdminDashboard extends JFrame {
         JPanel panel = new JPanel(new BorderLayout(0, 16));
         panel.setOpaque(false);
 
-        JLabel title = new JLabel("Welcome, " + currentUser.getName());
+        JLabel title = new JLabel("Welcome, " + currentUser.getAdminFirstName() + " " + currentUser.getAdminLastName());
         title.setFont(Theme.FONT_TITLE);
         title.setForeground(Theme.TEXT_PRIMARY);
 
