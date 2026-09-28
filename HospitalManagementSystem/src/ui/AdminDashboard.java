@@ -7,6 +7,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import model.Admin;
 import model.Doctor;
+import model.HospitalAsset;
 import model.HospitalRoom;
 import model.HospitalRoomRole;
 import model.Insurance;
@@ -14,6 +15,7 @@ import model.MedicalManager;
 import model.Patient;
 import service.AdminService;
 import service.InsuranceService;
+import service.RoomAssetsService;
 import service.RoomRoleService;
 import service.RoomService;
 import util.Theme;
@@ -36,6 +38,8 @@ public class AdminDashboard extends JFrame {
     private RoomRoleService rRS = new RoomRoleService();
     private int selectedRoomRoleId;
     private String roomRoleAction = "update";
+    private RoomAssetsService rAS = new RoomAssetsService();
+    private int selectedAssetId;
 
     public AdminDashboard(Admin user) {
         this.currentUser = user;
@@ -222,16 +226,243 @@ public class AdminDashboard extends JFrame {
         });
 
         deleteRoom.addActionListener(e -> {
-
+            String status = rS.updateFile("delete", this.selectedRoomId, "", "", false);
+            roomModel.setRowCount(0);
+            System.out.println(this.selectedFloorNumber);
+            this.selectedFloorNumber = Integer.parseInt((String) selectFloorDropDown.getSelectedItem());
+            List<HospitalRoom> hospitalRoomObjectList1 = rS.getHospitalRoomList(this.selectedFloorNumber);
+            for (HospitalRoom a: hospitalRoomObjectList1) {
+                roomModel.addRow(new Object[] {a.getDoorNumberId(),a.getRoomName(),a.getRoomRole(),a.getRoomStatus()});
+            }
+            editRoom.setEnabled(false);
+            deleteRoom.setEnabled(false);
+            viewAssets.setEnabled(false);
         });
 
         viewAssets.addActionListener(e -> {
-
+            displayAssetInRoom(contentPanel);
         });
 
         contentPanel.revalidate();
         contentPanel.repaint();
     }
+
+    public void displayAssetInRoom(JPanel contentPanel) {
+        contentPanel.removeAll();
+
+        JLabel title = new JLabel();
+        title.setText("Asset in room " + this.selectedRoomId);
+        title.setBounds(10, 5, 300, 30);
+        title.setFont(Theme.FONT_HEADING);
+        contentPanel.add(title);
+
+        JButton addAssetButton = new JButton();
+        addAssetButton.setText("Add Asset");
+        addAssetButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        addAssetButton.setBounds(580,52, 100, 25);
+        contentPanel.add(addAssetButton);
+       
+        JButton editAssetButton = new JButton();
+        editAssetButton.setText("Edit Asset");
+        editAssetButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        editAssetButton.setBounds(680,52, 100, 25);
+        editAssetButton.setEnabled(false);
+        contentPanel.add(editAssetButton);
+
+        JButton deleteAssetButton = new JButton();
+        deleteAssetButton.setText("Delete Asset");
+        deleteAssetButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        deleteAssetButton.setBounds(780,52, 100, 25);
+        deleteAssetButton.setEnabled(false);
+        contentPanel.add(deleteAssetButton);
+
+        JButton backButton = new JButton();
+        backButton.setText("Back");
+        backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        backButton.setBounds(5,52, 100, 25);
+        contentPanel.add(backButton);
+
+        String assetHeader = "asset_id,asset_name,asset_acquisition_year,asset_acquisition_month,asset_acquisition_day,asset_at_room_id";
+        String[] assetHeaderList = assetHeader.split(",");
+        DefaultTableModel assetModel = new DefaultTableModel(assetHeaderList, 0) {
+            @Override
+            public boolean isCellEditable(int r, int c) {
+                return false;
+            }
+        };
+
+        List<HospitalAsset> hospitalAssetList = rAS.getAssetInRoomList(this.selectedRoomId);
+        for (HospitalAsset a: hospitalAssetList) {
+            assetModel.addRow(new Object[] {a.getAssetId() ,a.getAssetName(), a.getAssetYear(),a.getAssetMonth(),a.getAssetDay(),a.getAssetAtRoomId()});
+        }
+
+        JTable assetTable = new JTable(assetModel);
+        assetTable.setRowHeight(32);
+        assetTable.getSelectionModel().addListSelectionListener(e -> {
+            int selectedRow = assetTable.getSelectedRow();
+            if(selectedRow != -1) {
+                Object id = assetTable.getValueAt(selectedRow,0);
+                this.selectedAssetId = Integer.parseInt(String.valueOf(id));
+                editAssetButton.setEnabled(true);
+                deleteAssetButton.setEnabled(true);
+            } else {
+                editAssetButton.setEnabled(false);
+                deleteAssetButton.setEnabled(false);
+            }
+        });
+
+        JScrollPane assetScrollPane = new JScrollPane(assetTable);
+        assetScrollPane.setBounds(5,80, 885,510);
+        contentPanel.add(assetScrollPane);
+
+        addAssetButton.addActionListener(e -> {
+            displayAddUpdateAssetInRoom(contentPanel, "append");
+        });
+
+        editAssetButton.addActionListener (e -> {
+            displayAddUpdateAssetInRoom(contentPanel, "update");
+        });
+
+        deleteAssetButton.addActionListener(e -> {
+            String status = rAS.updateFile("delete", this.selectedAssetId, "", 0, 0, 0);
+            displayAssetInRoom(contentPanel);
+        });
+
+        backButton.addActionListener(e -> {
+            displayRoom(contentPanel);
+        });
+
+
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+
+    public void displayAddUpdateAssetInRoom(JPanel contentPanel, String action) {
+        contentPanel.removeAll();
+        JLabel title = new JLabel();
+        title.setFont(Theme.FONT_TITLE);
+        title.setBounds(10, 5, 300,30);
+        contentPanel.add(title);
+
+        JLabel assetIdLabel = new JLabel();
+        assetIdLabel.setText("Asset ID:");
+        assetIdLabel.setFont(Theme.FONT_BODY);
+        assetIdLabel.setBounds(10, 45, 300,30);
+        contentPanel.add(assetIdLabel);
+
+        JTextField assetIdField = new JTextField();
+        assetIdField.setFont(Theme.FONT_BODY);
+        assetIdField.setBounds(10, 85, 300,30);
+        contentPanel.add(assetIdField);
+
+        JLabel assetNameLabel = new JLabel();
+        assetNameLabel.setText("Asset Name:");
+        assetNameLabel.setFont(Theme.FONT_BODY);
+        assetNameLabel.setBounds(10, 125, 300,30);
+        contentPanel.add(assetNameLabel);
+
+        JTextField assetNameField = new JTextField();
+        assetNameField.setFont(Theme.FONT_BODY);
+        assetNameField.setBounds(10, 165, 300,30);
+        contentPanel.add(assetNameField);
+
+        JLabel assetYearLabel = new JLabel();
+        assetYearLabel.setText("Acquisition Year:");
+        assetYearLabel.setFont(Theme.FONT_BODY);
+        assetYearLabel.setBounds(10, 205, 300,30);
+        contentPanel.add(assetYearLabel);
+
+        JTextField assetYearField = new JTextField();
+        assetYearField.setFont(Theme.FONT_BODY);
+        assetYearField.setBounds(10, 245, 300,30);
+        contentPanel.add(assetYearField);
+
+        JLabel assetMonthLabel = new JLabel();
+        assetMonthLabel.setText("Acquisition Month:");
+        assetMonthLabel.setFont(Theme.FONT_BODY);
+        assetMonthLabel.setBounds(10, 285, 300,30);
+        contentPanel.add(assetMonthLabel);
+
+        JTextField assetMonthField = new JTextField();
+        assetMonthField.setFont(Theme.FONT_BODY);
+        assetMonthField.setBounds(10, 325, 300,30);
+        contentPanel.add(assetMonthField);
+
+        JLabel assetDayLabel = new JLabel();
+        assetDayLabel.setText("Acquisition Day:");
+        assetDayLabel.setFont(Theme.FONT_BODY);
+        assetDayLabel.setBounds(10, 365, 300,30);
+        contentPanel.add(assetDayLabel);
+
+        JTextField assetDayField = new JTextField();
+        assetDayField.setFont(Theme.FONT_BODY);
+        assetDayField.setBounds(10, 405, 300,30);
+        contentPanel.add(assetDayField);
+
+        JLabel assetAtRoomIdLabel = new JLabel();
+        assetAtRoomIdLabel.setText("Asset At Room ID:");
+        assetAtRoomIdLabel.setFont(Theme.FONT_BODY);
+        assetAtRoomIdLabel.setBounds(330, 45, 300,30);
+        contentPanel.add(assetAtRoomIdLabel);
+
+        JTextField assetAtRoomIdField = new JTextField();
+        assetAtRoomIdField.setEditable(false);
+        assetAtRoomIdField.setText(String.valueOf(this.selectedRoomId));
+        assetAtRoomIdField.setFont(Theme.FONT_BODY);
+        assetAtRoomIdField.setBounds(330, 85, 300,30);
+        contentPanel.add(assetAtRoomIdField);
+
+        JButton save = new JButton();
+        save.setText("Save");
+        save.setBounds(120, 465, 80, 30);
+        save.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        contentPanel.add(save);
+
+        JButton back = new JButton();
+        back.setText("Back");
+        back.setBounds(240, 465, 80, 30);
+        back.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        contentPanel.add(back);
+
+        if (action.equals("append")) {
+            title.setText("Add Asset");
+            int latestAssetId = rAS.getLatestAssetIdInRoom(this.selectedRoomId);
+            assetIdField.setEditable(false);
+            assetIdField.setText(String.valueOf(latestAssetId));
+        } else if (action.equals("update")) {
+            List<HospitalAsset> tempAssetList = rAS.getAssetInRoomList(this.selectedRoomId);
+            HospitalAsset targetedObj = null;
+            for (HospitalAsset a: tempAssetList) {
+                if (a.getAssetId() == this.selectedAssetId) {
+                    targetedObj = a;
+                }
+            }
+            title.setText("Edit Asset");
+            assetIdField.setEditable(false);
+            assetIdField.setText(String.valueOf(this.selectedAssetId));
+            assetNameField.setText(targetedObj.getAssetName());
+            assetYearField.setText(String.valueOf(targetedObj.getAssetYear()));
+            assetMonthField.setText(String.valueOf(targetedObj.getAssetMonth()));
+            assetDayField.setText(String.valueOf(targetedObj.getAssetDay()));
+
+        }
+        save.addActionListener(e -> {
+            if (action.equals("append")) {
+                String status = rAS.appendFile(assetNameField.getText(),Integer.parseInt(assetYearField.getText()),Integer.parseInt(assetMonthField.getText()),Integer.parseInt(assetDayField.getText()),Integer.parseInt(assetAtRoomIdField.getText()));
+            } else if (action.equals("update")) {
+                String status = rAS.updateFile("update", this.selectedAssetId, assetNameField.getText(),Integer.parseInt(assetYearField.getText()),Integer.parseInt(assetMonthField.getText()),Integer.parseInt(assetDayField.getText()));
+            }
+            displayRoom(contentPanel);
+        });
+
+        back.addActionListener(e -> {
+            displayRoom(contentPanel);
+        });
+        
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+
 //900 width 600height
     public void displayAddUpdateRoom(JPanel contentPanel, String action) {
         contentPanel.removeAll();
