@@ -200,15 +200,16 @@ public class AdminDashboard extends JFrame {
         contentPanel.add(insuranceScrollPane);
 
         addInsurance.addActionListener(e -> {
-
+            displayAddUpdateInsurance( contentPanel, "append");
         });
 
         editInsurance.addActionListener(e -> {
-
+            displayAddUpdateInsurance( contentPanel, "update");
         });
 
         deleteInsurance.addActionListener(e -> {
-
+            String status = iS.updateFile("delete",this.selectedInsuranceId, "", false);
+            displayInsuranceAndConsult(contentPanel);
         });
 
         contentPanel.repaint();
@@ -224,19 +225,19 @@ public class AdminDashboard extends JFrame {
         title.setFont(Theme.FONT_HEADING);
         contentPanel.add(title); 
 
-     JLabel insuranceIdLabel = new JLabel();
-        insuranceIdLabel.setText("Asset ID:");
+        JLabel insuranceIdLabel = new JLabel();
+        insuranceIdLabel.setText("Insurance ID:");
         insuranceIdLabel.setFont(Theme.FONT_BODY);
         insuranceIdLabel.setBounds(10, 45, 300,30);
         contentPanel.add(insuranceIdLabel);
 
         JTextField insuranceIdField = new JTextField();
+        insuranceIdField.setEditable(false);
         insuranceIdField.setFont(Theme.FONT_BODY);
         insuranceIdField.setBounds(10, 85, 300,30);
-        contentPanel.add(insuranceIdField);
 
         JLabel insuranceNameLabel = new JLabel();
-        insuranceNameLabel.setText("Asset Name:");
+        insuranceNameLabel.setText("Insurance Name:");
         insuranceNameLabel.setFont(Theme.FONT_BODY);
         insuranceNameLabel.setBounds(10, 125, 300,30);
         contentPanel.add(insuranceNameLabel);
@@ -247,7 +248,7 @@ public class AdminDashboard extends JFrame {
         contentPanel.add(insuranceNameField);
 
         JLabel insuranceIsActiveLabel = new JLabel();
-        insuranceIsActiveLabel.setText("Acquisition Year:");
+        insuranceIsActiveLabel.setText("Insurance Status:");
         insuranceIsActiveLabel.setFont(Theme.FONT_BODY);
         insuranceIsActiveLabel.setBounds(10, 205, 300,30);
         contentPanel.add(insuranceIsActiveLabel);
@@ -256,6 +257,47 @@ public class AdminDashboard extends JFrame {
         insuranceIsActiveField.setFont(Theme.FONT_BODY);
         insuranceIsActiveField.setBounds(10, 245, 300,30);
         contentPanel.add(insuranceIsActiveField);
+
+        JButton save = new JButton();
+        save.setText("Save");
+        save.setBounds(40, 290, 80, 30);
+        save.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        contentPanel.add(save);
+
+        JButton back = new JButton();
+        back.setText("Back");
+        back.setBounds(120, 290, 80, 30);
+        back.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        contentPanel.add(back);
+
+        if (action.equals("append")) {
+            insuranceIdField.setText(String.valueOf(iS.getLatestInsuranceId()));
+
+        } else if (action.equals("update")) {
+            List<Insurance> insuranceObjectList = iS.getInsuranceList();
+            Insurance targetedObj = null;
+            for (Insurance a: insuranceObjectList) {
+                if (this.selectedInsuranceId == a.getInsuranceId()) {
+                    targetedObj = a;
+                }
+            }
+            insuranceIdField.setText(String.valueOf(this.selectedInsuranceId));
+            insuranceNameField.setText(targetedObj.getInsuranceName());
+            insuranceIsActiveField.setText(String.valueOf(targetedObj.getInsuranceIsActive()));
+        }
+
+        save.addActionListener(e -> {
+            if (action.equals("append")) {
+                String status = iS.appendFile(insuranceNameField.getText(), Boolean.parseBoolean(insuranceIsActiveField.getText()));
+            } else if (action.equals("update")) {
+                String status = iS.updateFile("update", this.selectedInsuranceId, insuranceNameField.getText(), Boolean.parseBoolean(insuranceIsActiveField.getText()));
+            }   
+            displayInsuranceAndConsult(contentPanel);
+        });
+
+        back.addActionListener(e -> {
+            displayInsuranceAndConsult(contentPanel);
+        });
 
         contentPanel.validate();
         contentPanel.repaint();
