@@ -1,12 +1,12 @@
 package dao;
 
-import java.io.IOException;
-import java.io.FileReader;
 import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class LoadConsultRate {
 
-    private String filePath = "data/base_consultation_rate";
+    private String filePath = "data/base_consultation_rate.txt";
     private double consultationRate;
 
     public String loadConsultationRate() {

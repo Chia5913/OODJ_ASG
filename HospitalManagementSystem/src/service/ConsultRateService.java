@@ -20,6 +20,7 @@ public class ConsultRateService {
     }
 
     public double getBaseConsultationRate() {
+        loadConsultationRate();
         return this.consultRate;
     }
 

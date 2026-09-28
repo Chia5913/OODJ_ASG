@@ -14,6 +14,7 @@ import model.Insurance;
 import model.MedicalManager;
 import model.Patient;
 import service.AdminService;
+import service.ConsultRateService;
 import service.InsuranceService;
 import service.RoomAssetsService;
 import service.RoomRoleService;
@@ -40,6 +41,9 @@ public class AdminDashboard extends JFrame {
     private String roomRoleAction = "update";
     private RoomAssetsService rAS = new RoomAssetsService();
     private int selectedAssetId;
+    private ConsultRateService cRS = new ConsultRateService();
+    private int selectedInsuranceId;
+    private InsuranceService iS = new InsuranceService();
 
     public AdminDashboard(Admin user) {
         this.currentUser = user;
@@ -111,8 +115,150 @@ public class AdminDashboard extends JFrame {
         userManagement.addActionListener(e -> displayUserTable(contentPanel));
         manageDoctor.addActionListener(e -> displayManageDoctor(contentPanel));
         manageRoom.addActionListener(e -> displayRoom(contentPanel));
+        manageInsurance.addActionListener(e -> displayInsuranceAndConsult(contentPanel));
 
         displayUserTable(contentPanel);
+    }
+
+    private void displayInsuranceAndConsult(JPanel contentPanel) {
+        contentPanel.removeAll();
+        
+        JLabel title = new JLabel();
+        title.setText("Insurance and Consultation Managemenet Page");
+        title.setBounds(10, 5, 400, 30);
+        title.setFont(Theme.FONT_HEADING);
+        contentPanel.add(title); 
+
+        JLabel consultRateLabel = new JLabel();
+        consultRateLabel.setText("Base Consultation Rate:");
+        consultRateLabel.setFont(Theme.FONT_BODY);
+        consultRateLabel.setBounds(5,45,300,30);
+        contentPanel.add(consultRateLabel);
+
+        double consultationDouble = cRS.getBaseConsultationRate();
+        System.out.println(consultationDouble);
+        JTextField consultRateField = new JTextField();
+        consultRateField.setBounds(5,70,200,25);
+        consultRateField.setText(String.valueOf(consultationDouble));
+        contentPanel.add(consultRateField);
+
+        JButton saveConsultRate = new JButton();
+        saveConsultRate.setBounds(220,70,80,25);
+        saveConsultRate.setText("Save");
+        contentPanel.add(saveConsultRate);
+
+        String insuranceHeader = "insurance_id,insurance_name,insurance_is_active";
+        String[] insuranceHeaderList = insuranceHeader.split(",");
+        DefaultTableModel insuranceModel = new DefaultTableModel(insuranceHeaderList, 0) {
+            @Override 
+            public boolean isCellEditable(int r ,  int c) {
+                return false;
+            }
+        };
+
+        JButton addInsurance = new JButton();
+        addInsurance.setText("Add");
+        addInsurance.setBounds(580,70,80,30);
+        addInsurance.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        contentPanel.add(addInsurance);
+
+        JButton editInsurance = new JButton();
+        editInsurance.setText("Edit");
+        editInsurance.setEnabled(false);
+        editInsurance.setBounds(680,70,80,30);
+        editInsurance.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        contentPanel.add(editInsurance);
+
+        JButton deleteInsurance = new JButton();
+        deleteInsurance.setText("Delete");
+        deleteInsurance.setEnabled(false);
+        deleteInsurance.setBounds(780,70,80,30);
+        deleteInsurance.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        contentPanel.add(deleteInsurance);
+               
+        List<Insurance> insuranceObjectList = iS.getInsuranceList();
+        for (Insurance a: insuranceObjectList) {
+            insuranceModel.addRow(new Object[] {a.getInsuranceId(),a.getInsuranceName(),a.getInsuranceIsActive()});
+        }
+
+        JTable insuranceTable = new JTable(insuranceModel);
+        insuranceTable.setRowHeight(32);
+        insuranceTable.getSelectionModel().addListSelectionListener(e -> {
+            int selectedRow = insuranceTable.getSelectedRow();
+            if(selectedRow != -1) {
+                Object id = insuranceTable.getValueAt(selectedRow,0);
+                this.selectedInsuranceId = Integer.parseInt(String.valueOf(id));
+                editInsurance.setEnabled(true);
+                deleteInsurance.setEnabled(true);
+            } else {
+                editInsurance.setEnabled(false);
+                deleteInsurance.setEnabled(false);
+            }
+        });
+        JScrollPane insuranceScrollPane = new JScrollPane(insuranceTable);
+        insuranceScrollPane.setBounds(5, 120, 870,500);
+        contentPanel.add(insuranceScrollPane);
+
+        addInsurance.addActionListener(e -> {
+
+        });
+
+        editInsurance.addActionListener(e -> {
+
+        });
+
+        deleteInsurance.addActionListener(e -> {
+
+        });
+
+        contentPanel.repaint();
+        contentPanel.revalidate();
+    }
+
+    private void displayAddUpdateInsurance(JPanel contentPanel, String action) {
+
+        contentPanel.removeAll();
+
+        JLabel title = new JLabel();
+        title.setBounds(10, 5, 400, 30);
+        title.setFont(Theme.FONT_HEADING);
+        contentPanel.add(title); 
+
+     JLabel insuranceIdLabel = new JLabel();
+        insuranceIdLabel.setText("Asset ID:");
+        insuranceIdLabel.setFont(Theme.FONT_BODY);
+        insuranceIdLabel.setBounds(10, 45, 300,30);
+        contentPanel.add(insuranceIdLabel);
+
+        JTextField insuranceIdField = new JTextField();
+        insuranceIdField.setFont(Theme.FONT_BODY);
+        insuranceIdField.setBounds(10, 85, 300,30);
+        contentPanel.add(insuranceIdField);
+
+        JLabel insuranceNameLabel = new JLabel();
+        insuranceNameLabel.setText("Asset Name:");
+        insuranceNameLabel.setFont(Theme.FONT_BODY);
+        insuranceNameLabel.setBounds(10, 125, 300,30);
+        contentPanel.add(insuranceNameLabel);
+
+        JTextField insuranceNameField = new JTextField();
+        insuranceNameField.setFont(Theme.FONT_BODY);
+        insuranceNameField.setBounds(10, 165, 300,30);
+        contentPanel.add(insuranceNameField);
+
+        JLabel insuranceIsActiveLabel = new JLabel();
+        insuranceIsActiveLabel.setText("Acquisition Year:");
+        insuranceIsActiveLabel.setFont(Theme.FONT_BODY);
+        insuranceIsActiveLabel.setBounds(10, 205, 300,30);
+        contentPanel.add(insuranceIsActiveLabel);
+
+        JTextField insuranceIsActiveField = new JTextField();
+        insuranceIsActiveField.setFont(Theme.FONT_BODY);
+        insuranceIsActiveField.setBounds(10, 245, 300,30);
+        contentPanel.add(insuranceIsActiveField);
+
+        contentPanel.validate();
+        contentPanel.repaint();
     }
 
     private void displayRoom(JPanel contentPanel) {

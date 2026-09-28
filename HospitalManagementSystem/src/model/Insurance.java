@@ -6,7 +6,7 @@ public class Insurance {
     private String insuranceName;
     private boolean insuranceIsActive;
 
-    public Insurance(int insurnaceId, String insuranceName, boolean insuranceIsActive) {
+    public Insurance(int insuranceId, String insuranceName, boolean insuranceIsActive) {
         this.insuranceId = insuranceId;
         this.insuranceName = insuranceName;
         this.insuranceIsActive = insuranceIsActive;
