@@ -1,10 +1,10 @@
 package service;
 
-import java.util.List;
-import dao.WriteRoom;
 import dao.LoadRoom;
-import model.HospitalRoom;
+import dao.WriteRoom;
 import java.util.ArrayList;
+import java.util.List;
+import model.HospitalRoom;
 
 public class RoomService {
 
@@ -32,6 +32,9 @@ public class RoomService {
                     latestRoomId = roomId;
                 }
             }
+        }
+        if (latestRoomId == 0) {
+            latestRoomId = selectedFloorNumber * 100;
         }
         return latestRoomId + 1;
     }
