@@ -34,6 +34,8 @@ public class AdminDashboard extends JFrame {
     private int selectedRoomId;
     private RoomService rS = new RoomService();
     private RoomRoleService rRS = new RoomRoleService();
+    private int selectedRoomRoleId;
+    private String roomRoleAction = "update";
 
     public AdminDashboard(Admin user) {
         this.currentUser = user;
@@ -353,6 +355,150 @@ public class AdminDashboard extends JFrame {
 
         backButton.addActionListener(e -> {
             displayRoom(contentPanel);
+        });
+
+        addRoomRoleButton.addActionListener(e -> {
+            displayAddRoomRole(contentPanel);
+        });
+
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+
+    public void displayAddRoomRole(JPanel contentPanel) {
+        contentPanel.removeAll();
+
+        JLabel title = new JLabel();
+        title.setText("Room Role Management Page");
+        title.setBounds(7, 5, 300, 28);
+        title.setFont(Theme.FONT_HEADING);
+        contentPanel.add(title); 
+
+        JLabel roomRoleIdLabel = new JLabel();
+        roomRoleIdLabel.setText("Room Role ID:");
+        roomRoleIdLabel.setFont(Theme.FONT_BODY);
+        roomRoleIdLabel.setBounds(10,20, 220, 30);
+        contentPanel.add(roomRoleIdLabel);
+        
+        JTextField roomRoleIdField = new JTextField();
+        roomRoleIdField.setBounds(10,50,220,30);
+        contentPanel.add(roomRoleIdField);
+
+
+        JLabel roomRoleNameLabel = new JLabel();
+        roomRoleNameLabel.setText("Room Role Name:");
+        roomRoleNameLabel.setFont(Theme.FONT_BODY);
+        roomRoleNameLabel.setBounds(250,20, 220, 30);
+        contentPanel.add(roomRoleNameLabel);
+
+        JTextField roomRoleNameField = new JTextField();
+        roomRoleNameField.setBounds(250,50,250,30);
+        contentPanel.add(roomRoleNameField);
+
+        JButton saveRoleButton = new JButton();
+        saveRoleButton.setText("Save");
+        saveRoleButton.setBounds(580, 50, 80, 30);
+        contentPanel.add(saveRoleButton);
+
+        JButton addNewRoleButton = new JButton();
+        addNewRoleButton.setText("New Role");
+        addNewRoleButton.setBounds(670,50,80,30);
+
+        JButton editExistingRoleButton = new JButton();
+        editExistingRoleButton.setText("Edit Mode");
+        editExistingRoleButton.setBounds(670,50,80,30);
+        contentPanel.add(editExistingRoleButton);
+
+        JButton deleteRoleButton = new JButton();
+        deleteRoleButton.setText("Delete");
+        deleteRoleButton.setBounds(760,50,80,30);
+
+        JButton backButton = new JButton();
+        backButton.setText("Back");
+        backButton.setBounds(760, 5, 80, 30);
+        contentPanel.add(backButton);
+
+        String roleListHeader = "room_role_id,room_role_name";
+        String[] roleListHeaderList = roleListHeader.split(",");
+        DefaultTableModel roleListModel = new DefaultTableModel(roleListHeaderList, 0) {
+            @Override
+            public boolean isCellEditable(int r, int c) {
+                return false;
+            }
+        };
+
+        JTable roleListTable = new JTable(roleListModel);
+        roleListTable.setRowHeight(32);
+
+        JScrollPane roleListScrollPane = new JScrollPane(roleListTable);
+        roleListScrollPane.setBounds(5, 90, 880, 550);
+        contentPanel.add(roleListScrollPane);
+
+        List<HospitalRoomRole> roomRoleListTemp = rRS.getRoomRoleList();
+        JComboBox<String> idForExistingDropDown = new JComboBox<>();
+        for (HospitalRoomRole a : roomRoleListTemp) {
+            roleListModel.addRow(new Object[]{a.getRoomRoleId(),a.getRoomRoleName()});
+            idForExistingDropDown.addItem(String.valueOf(a.getRoomRoleId()));
+        }
+        idForExistingDropDown.setBounds(10,50,180,30);
+
+        roomRoleIdField.setEditable(false);
+        roomRoleIdField.setText(String.valueOf(rRS.getRoomRoleLatestId()));
+
+        idForExistingDropDown.addActionListener(e -> {
+            this.selectedRoomRoleId = Integer.parseInt((String) idForExistingDropDown.getSelectedItem());
+        });
+
+        saveRoleButton.addActionListener(e -> {
+            String newRoomRoleName = roomRoleNameField.getText();
+            if (this.roomRoleAction.equals("update")) {
+                this.selectedRoomRoleId = Integer.parseInt((String) idForExistingDropDown.getSelectedItem());
+                String status = rRS.updateFile(this.roomRoleAction, this.selectedRoomRoleId, newRoomRoleName);
+            } else if (this.roomRoleAction.equals("append")) {
+                this.selectedRoomRoleId = Integer.parseInt(roomRoleIdField.getText());
+                String status = rRS.appendFile(this.selectedRoomRoleId, newRoomRoleName);
+            }
+            displayAddRoomRole(contentPanel);
+        });
+
+        backButton.addActionListener(e -> {
+            displayAddUpdateRoom(contentPanel, "add");
+        });
+
+        editExistingRoleButton.addActionListener(e -> {
+            contentPanel.remove(editExistingRoleButton);
+            contentPanel.add(deleteRoleButton);
+            contentPanel.add(addNewRoleButton);
+            contentPanel.remove(roomRoleIdField);
+            contentPanel.add(idForExistingDropDown);
+            contentPanel.revalidate();
+            contentPanel.repaint();
+            this.roomRoleAction = "update";
+        });
+
+        deleteRoleButton.addActionListener(e -> {
+            this.roomRoleAction = "delete";
+
+            this.selectedRoomRoleId = Integer.parseInt((String) idForExistingDropDown.getSelectedItem());
+            String status = rRS.updateFile(this.roomRoleAction, this.selectedRoomRoleId, "");
+            roleListModel.setRowCount(0);
+            List<HospitalRoomRole> roomRoleListTemp1 = rRS.getRoomRoleList();
+            for (HospitalRoomRole a : roomRoleListTemp1) {
+                roleListModel.addRow(new Object[]{a.getRoomRoleId(),a.getRoomRoleName()});
+                idForExistingDropDown.addItem(String.valueOf(a.getRoomRoleId()));
+        }
+        });
+
+        addNewRoleButton.addActionListener(e -> {
+            this.roomRoleAction = "append";
+            contentPanel.add(editExistingRoleButton);
+            contentPanel.remove(deleteRoleButton);
+            contentPanel.remove(addNewRoleButton);
+            contentPanel.add(roomRoleIdField);
+            contentPanel.remove(idForExistingDropDown);
+            contentPanel.revalidate();
+            contentPanel.repaint();
+
         });
 
         contentPanel.revalidate();
