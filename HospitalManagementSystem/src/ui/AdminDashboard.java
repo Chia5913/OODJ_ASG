@@ -8,11 +8,13 @@ import javax.swing.table.DefaultTableModel;
 import model.Admin;
 import model.Doctor;
 import model.HospitalRoom;
+import model.HospitalRoomRole;
 import model.Insurance;
 import model.MedicalManager;
 import model.Patient;
 import service.AdminService;
 import service.InsuranceService;
+import service.RoomRoleService;
 import service.RoomService;
 import util.Theme;
 
@@ -31,6 +33,7 @@ public class AdminDashboard extends JFrame {
     private int selectedFloorNumber;
     private int selectedRoomId;
     private RoomService rS = new RoomService();
+    private RoomRoleService rRS = new RoomRoleService();
 
     public AdminDashboard(Admin user) {
         this.currentUser = user;
@@ -161,7 +164,6 @@ public class AdminDashboard extends JFrame {
         contentPanel.add(viewAssets);
 
         this.selectedFloorNumber = Integer.parseInt((String) selectFloorDropDown.getSelectedItem());
-        System.out.println(this.selectedFloorNumber);
         String roomHeader = "room_door_number_id,room_designated_name,room_role,room_status";
         String[] roomHeaderList = roomHeader.split(",");
         DefaultTableModel roomModel = new DefaultTableModel(roomHeaderList, 0) {
@@ -196,9 +198,9 @@ public class AdminDashboard extends JFrame {
         roomScrollPane.setBounds(5, 85, 870,510);
         contentPanel.add(roomScrollPane);
 
-
         selectFloorDropDown.addActionListener(e -> {
             roomModel.setRowCount(0);
+            System.out.println(this.selectedFloorNumber);
             this.selectedFloorNumber = Integer.parseInt((String) selectFloorDropDown.getSelectedItem());
             List<HospitalRoom> hospitalRoomObjectList1 = rS.getHospitalRoomList(this.selectedFloorNumber);
             for (HospitalRoom a: hospitalRoomObjectList1) {
@@ -207,6 +209,150 @@ public class AdminDashboard extends JFrame {
             editRoom.setEnabled(false);
             deleteRoom.setEnabled(false);
             viewAssets.setEnabled(false);
+        });
+
+        addRoom.addActionListener(e -> {    
+            displayAddUpdateRoom(contentPanel, "add");
+        });
+
+        editRoom.addActionListener(e -> {
+            displayAddUpdateRoom(contentPanel, "update");
+        });
+
+        deleteRoom.addActionListener(e -> {
+
+        });
+
+        viewAssets.addActionListener(e -> {
+
+        });
+
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+//900 width 600height
+    public void displayAddUpdateRoom(JPanel contentPanel, String action) {
+        contentPanel.removeAll();
+
+        JLabel roomIdLabel = new JLabel();
+        roomIdLabel.setText("Room Number ID:");
+        roomIdLabel.setFont(Theme.FONT_BODY);
+        roomIdLabel.setBounds(10, 50, 220,30);
+        contentPanel.add(roomIdLabel);
+
+        JTextField roomIdField = new JTextField();
+        roomIdField.setFont(Theme.FONT_BODY);
+        roomIdField.setBounds(10, 90, 220,30);
+        contentPanel.add(roomIdField);
+
+        JLabel roomNameLabel = new JLabel();
+        roomNameLabel.setText("Room Designated Name:");
+        roomNameLabel.setFont(Theme.FONT_BODY);
+        roomNameLabel.setBounds(10, 160, 220,30);
+        contentPanel.add(roomNameLabel);
+
+        JTextField roomNameField = new JTextField();
+        roomNameField.setFont(Theme.FONT_BODY);
+        roomNameField.setBounds(10, 200, 220,30);
+        contentPanel.add(roomNameField);
+
+        JLabel roomRoleLabel = new JLabel();
+        roomRoleLabel.setText("Room Designated Role:");
+        roomRoleLabel.setFont(Theme.FONT_BODY);
+        roomRoleLabel.setBounds(10, 280, 220,30);
+        contentPanel.add(roomRoleLabel);
+
+        JComboBox<String> roomRoleField = new JComboBox<>();
+        List<HospitalRoomRole> roomRoleList = rRS.getRoomRoleList();
+        for(HospitalRoomRole a: roomRoleList) {
+            roomRoleField.addItem(a.getRoomRoleName());
+        }
+        roomRoleField.setFont(Theme.FONT_BODY);
+        roomRoleField.setBounds(10, 320, 220,30);
+        contentPanel.add(roomRoleField);
+
+        JLabel roomStatusLabel = new JLabel();
+        roomStatusLabel.setText("Room status:");
+        roomStatusLabel.setFont(Theme.FONT_BODY);
+        roomStatusLabel.setBounds(10, 400, 220,30);
+        contentPanel.add(roomStatusLabel);
+
+        String[] booleanList = {"true", "false"};
+        JComboBox<String> roomStatusField = new JComboBox<>(booleanList);
+        roomStatusField.setFont(Theme.FONT_BODY);
+        roomStatusField.setBounds(10, 440, 220,30);
+        contentPanel.add(roomStatusField);
+
+        JButton saveButton = new JButton();
+        saveButton.setText("Save");
+        saveButton.setFont(Theme.FONT_BUTTON);
+        saveButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        saveButton.setBounds(60,500,80,30);
+        contentPanel.add(saveButton);
+
+        JButton backButton = new JButton();
+        backButton.setText("Back");
+        backButton.setFont(Theme.FONT_BUTTON);
+        backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        backButton.setBounds(180,500,80,30);
+        contentPanel.add(backButton);
+
+        JButton addRoomRoleButton = new JButton();
+        addRoomRoleButton.setText("Add room role");
+        addRoomRoleButton.setFont(Theme.FONT_BUTTON);
+        addRoomRoleButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        addRoomRoleButton.setBounds(250,320,150,30);
+        contentPanel.add(addRoomRoleButton);
+
+        if (action.equals("add")) {
+            JLabel title = new JLabel();
+            title.setText("Add new room");
+            title.setFont(Theme.FONT_TITLE);
+            title.setBounds(10,5,220,30);
+            contentPanel.add(title);
+
+            roomIdField.setText(String.valueOf(rS.getLatestRoomId(this.selectedFloorNumber)));
+            roomIdField.setEditable(false);
+
+        } else if (action.equals("update")) {
+            List<HospitalRoom> hospitalRoomListTemp = rS.getHospitalRoomList(this.selectedFloorNumber);
+            HospitalRoom targetObject = null;
+            for (HospitalRoom a: hospitalRoomListTemp) {
+                if (a.getDoorNumberId() == this.selectedRoomId) {
+                    targetObject = a;
+                }
+            }
+            JLabel title = new JLabel();
+            title.setText("Update existing room");
+            title.setFont(Theme.FONT_TITLE);
+            title.setBounds(10,5,220,30);
+            contentPanel.add(title);
+            roomIdField.setEditable(false);
+            roomIdField.setText(String.valueOf(targetObject.getDoorNumberId()));
+            roomNameField.setText(targetObject.getRoomName());
+            roomRoleField.setSelectedItem(targetObject.getRoomRole());
+            roomStatusField.setSelectedItem(targetObject.getRoomStatus());
+
+        } else {
+            return;
+        }
+
+        saveButton.addActionListener(e -> {
+            int savingRoomId = Integer.parseInt(roomIdField.getText());
+            String savingRoomName = roomNameField.getText();
+            String savingRoomRole = (String) roomRoleField.getSelectedItem();
+            boolean savingRoomStatus = Boolean.parseBoolean((String) roomStatusField.getSelectedItem());
+
+            if (action.equals("add")) {
+                String status = rS.appendFile(savingRoomName, savingRoomRole, savingRoomStatus);
+            } else if (action.equals("update")) {
+                String status = rS.updateFile(action, savingRoomId, savingRoomName, savingRoomRole, savingRoomStatus);
+            }
+            displayRoom(contentPanel);
+        });
+
+        backButton.addActionListener(e -> {
+            displayRoom(contentPanel);
         });
 
         contentPanel.revalidate();
