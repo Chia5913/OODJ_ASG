@@ -235,6 +235,7 @@ public class AdminDashboard extends JFrame {
         insuranceIdField.setEditable(false);
         insuranceIdField.setFont(Theme.FONT_BODY);
         insuranceIdField.setBounds(10, 85, 300,30);
+        contentPanel.add(insuranceIdField);
 
         JLabel insuranceNameLabel = new JLabel();
         insuranceNameLabel.setText("Insurance Name:");
