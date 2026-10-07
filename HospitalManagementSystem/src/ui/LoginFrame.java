@@ -482,8 +482,6 @@ public class LoginFrame extends JFrame {
         } else if (loginStatus.equals("Incorrect password")){
                 Validation.showError(this, loginStatus);
                 return;
-        } else {
-                Validation.showError(this, loginStatus);
         }
 
         MedicalManager manager =
